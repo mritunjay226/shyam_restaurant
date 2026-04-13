@@ -84,7 +84,7 @@ export function Home() {
         
         <div className="relative w-full">
           <div className="absolute -top-12 md:-top-16 left-1/2 -translate-x-1/2 z-20">
-            <Link href="/rooms" className="w-24 h-24 md:w-32 md:h-32 bg-brand-red rounded-full text-white flex flex-col items-center justify-center border-[4px] md:border-[6px] border-brand-cream hover:scale-105 transition-transform shadow-lg">
+            <Link href="/rooms" className="w-24 h-24 md:w-32 md:h-32 bg-brand-red rounded-full text-white flex flex-col items-center justify-center border-4 md:border-[6px] border-brand-cream hover:scale-105 transition-transform shadow-lg">
               <ArrowDown className="mb-1 w-4 h-4 md:w-5 md:h-5" />
               <span className="text-[8px] md:text-[9px] uppercase tracking-widest text-center px-4 font-bold leading-tight mt-1">Book Your<br className="hidden md:block"/>Stay</span>
             </Link>
@@ -98,13 +98,13 @@ export function Home() {
                   y: ["0%", "2%", "0%"]
                 }}
                 transition={{ 
-                  duration: 30, 
+                  duration: 20, 
                   ease: "easeInOut",
                   repeat: Infinity 
                 }}
-                src="https://images.pexels.com/photos/16777746/pexels-photo-16777746.jpeg" 
+                src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776095845/ChatGPT_Image_Apr_13_2026_09_19_41_PM_1_1_lgr5fv.png" 
                 alt="Luxury Hotel Exterior" 
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover bg-bottom"
                 referrerPolicy="no-referrer"
               />
             </motion.div>
@@ -129,11 +129,11 @@ export function Home() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8">
               <Button className="w-full sm:w-auto px-8 py-6 text-xs tracking-widest uppercase">Discover Our Story</Button>
               <div className="flex items-center gap-4">
-                <div className="flex -space-x-4">
+                {/* <div className="flex -space-x-4">
                   <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" className="w-12 h-12 rounded-full border-2 border-brand-cream object-cover" alt="Customer" />
                   <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=100&auto=format&fit=crop" className="w-12 h-12 rounded-full border-2 border-brand-cream object-cover" alt="Customer" />
                   <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" className="w-12 h-12 rounded-full border-2 border-brand-cream object-cover" alt="Customer" />
-                </div>
+                </div> */}
                 <div className="text-sm">
                   <p className="font-bold text-brand-brown">5-Star Hospitality</p>
                   <p className="text-brand-brown/60 text-xs">Loved by thousands of guests</p>
@@ -144,7 +144,7 @@ export function Home() {
           <div className="flex-1 flex justify-end">
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=600&auto=format&fit=crop" 
+                src="https://res.cloudinary.com/diah8zonu/image/upload/v1776090129/shyam-hotel/qfsqnmyhsjja0uvilffn.jpg" 
                 alt="Luxury Suite" 
                 className="rounded-3xl w-full max-w-md object-cover shadow-xl"
                 referrerPolicy="no-referrer"
@@ -190,7 +190,7 @@ export function Home() {
                     <BedDouble size={20} className="text-brand-red" />
                     <span className="text-xs uppercase tracking-widest font-semibold">Accommodations</span>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif mb-2">Luxury Stays</h3>
+                  <h3 className="text-3xl md:text-4xl font-serif mb-2 text-brand-cream">Hotel Rooms</h3>
                   <p className="text-xs sm:text-sm opacity-80">17 meticulously designed rooms & suites.</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-brand-red text-white flex items-center justify-center group-hover:bg-white group-hover:text-brand-red transition-colors">
@@ -201,7 +201,7 @@ export function Home() {
 
             {/* Restaurant */}
             <Link href="/restaurant" className="group relative h-[400px] rounded-3xl overflow-hidden block">
-              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Fine Dining" />
+              <img src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776096509/reataurant_ouzt5y.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Fine Dining" />
               <div className="absolute inset-0 bg-linear-to-t from-brand-brown/90 via-brand-brown/20 to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
                 <div className="text-brand-cream">
@@ -209,7 +209,7 @@ export function Home() {
                     <UtensilsCrossed size={20} className="text-brand-red" />
                     <span className="text-xs uppercase tracking-widest font-semibold">Ground Floor</span>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif mb-2">L'Aura Dining</h3>
+                  <h3 className="text-3xl md:text-4xl font-serif mb-2 text-brand-cream">Restaurant</h3>
                   <p className="text-xs sm:text-sm opacity-80">Fine dining blending tradition & innovation.</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-brand-red text-white flex items-center justify-center group-hover:bg-white group-hover:text-brand-red transition-colors">
@@ -220,7 +220,7 @@ export function Home() {
 
             {/* Cafe */}
             <Link href="/cafe" className="group relative h-[400px] rounded-3xl overflow-hidden block">
-              <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Cafe" />
+              <img src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776091186/cafe-out_jnqvn2.jpg" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Cafe" />
               <div className="absolute inset-0 bg-linear-to-t from-brand-brown/90 via-brand-brown/20 to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
                 <div className="text-brand-cream">
@@ -228,7 +228,7 @@ export function Home() {
                     <Coffee size={20} className="text-brand-red" />
                     <span className="text-xs uppercase tracking-widest font-semibold">Upper Floor</span>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif mb-2">Horizon Café</h3>
+                  <h3 className="text-3xl md:text-4xl font-serif mb-2 text-brand-cream">Café</h3>
                   <p className="text-xs sm:text-sm opacity-80">Artisanal coffee and freshly baked pastries.</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-brand-red text-white flex items-center justify-center group-hover:bg-white group-hover:text-brand-red transition-colors">
@@ -247,7 +247,7 @@ export function Home() {
                     <PartyPopper size={20} className="text-brand-red" />
                     <span className="text-xs uppercase tracking-widest font-semibold">Events</span>
                   </div>
-                  <h3 className="text-3xl md:text-4xl font-serif mb-2">Grand Banquets</h3>
+                  <h3 className="text-3xl md:text-4xl font-serif mb-2 text-brand-cream">Banquets</h3>
                   <p className="text-xs sm:text-sm opacity-80">4 distinctive venues for your memorable occasions.</p>
                 </div>
                 <div className="w-12 h-12 rounded-full bg-brand-red text-white flex items-center justify-center group-hover:bg-white group-hover:text-brand-red transition-colors">
@@ -398,9 +398,9 @@ export function Home() {
             </div>
           </div>
           <div className="flex-1 grid grid-cols-2 gap-3 sm:gap-4 w-full mt-8 md:mt-0">
-            <img src="https://images.unsplash.com/photo-1582719478250-c89402bb17cb?q=80&w=400&auto=format&fit=crop" className="w-full h-32 sm:h-48 md:h-64 object-cover rounded-2xl md:rounded-3xl" alt="Room" />
-            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=400&auto=format&fit=crop" className="w-full h-32 sm:h-48 md:h-64 object-cover rounded-2xl md:rounded-3xl mt-6 sm:mt-12" alt="Dining" />
-            <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800&auto=format&fit=crop" className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-2xl md:rounded-3xl col-span-2" alt="Banquet" />
+            <img src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776089519/shyam-hotel/rcphws3ceazwnrq8zdcx.jpg" className="w-full h-32 sm:h-48 md:h-64 object-cover rounded-2xl md:rounded-3xl" alt="Room" />
+            <img src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776090701/cafe_u2sfey.jpg" className="w-full h-32 sm:h-48 md:h-64 object-cover rounded-2xl md:rounded-3xl mt-6 sm:mt-12" alt="Dinning" />
+            <img src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776090962/banquet-maybe_wrswgw.jpg" className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-2xl md:rounded-3xl col-span-2" alt="Banquet" />
           </div>
         </motion.div>
       </section>
