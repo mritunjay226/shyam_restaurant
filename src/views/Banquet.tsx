@@ -161,8 +161,15 @@ export function Banquet() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="date" className="text-brand-cream/80">Preferred Date</Label>
-                  <Input id="date" type="date" className="bg-brand-brown-light border-brand-brown-light text-brand-cream" required />
+                  <Input 
+                    id="date" 
+                    type="date" 
+                    min={new Date().toISOString().split('T')[0]}
+                    className="bg-brand-brown-light border-brand-brown-light text-brand-cream" 
+                    required 
+                  />
                 </div>
+
 
                 <div className="space-y-2">
                   <Label htmlFor="guests" className="text-brand-cream/80">Guest Count</Label>
@@ -176,8 +183,20 @@ export function Banquet() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-brand-cream/80">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" className="bg-brand-brown-light border-brand-brown-light text-brand-cream placeholder:text-brand-cream/40" required />
+                  <div className="flex gap-2">
+                    <select 
+                      className="flex h-12 w-20 rounded-full border border-brand-brown-light bg-brand-brown-light text-brand-cream px-2 py-2 text-xs focus:outline-none"
+                    >
+                      <option value="+91">+91</option>
+                      <option value="+1">+1</option>
+                      <option value="+44">+44</option>
+                      <option value="+61">+61</option>
+                      <option value="+971">+971</option>
+                    </select>
+                    <Input id="phone" type="tel" placeholder="000-000-0000" className="bg-brand-brown-light border-brand-brown-light text-brand-cream placeholder:text-brand-cream/40 flex-1" required />
+                  </div>
                 </div>
+
 
                 <Button type="submit" variant="gold" className="w-full mt-4 py-6 text-xs uppercase tracking-widest font-semibold">
                   Submit Enquiry

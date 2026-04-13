@@ -228,6 +228,7 @@ export function RoomDetail() {
                           id="checkin" 
                           type="date" 
                           required 
+                          min={new Date().toISOString().split('T')[0]}
                           value={formState.checkIn}
                           onChange={(e) => setFormState({ ...formState, checkIn: e.target.value })}
                         />
@@ -238,11 +239,13 @@ export function RoomDetail() {
                           id="checkout" 
                           type="date" 
                           required 
+                          min={formState.checkIn || new Date().toISOString().split('T')[0]}
                           value={formState.checkOut}
                           onChange={(e) => setFormState({ ...formState, checkOut: e.target.value })}
                         />
                       </div>
                     </div>
+
 
                     <div className="space-y-2">
                       <Label htmlFor="guests">Guests</Label>

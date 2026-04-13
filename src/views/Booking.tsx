@@ -10,6 +10,20 @@ import { Select } from '../components/ui/select';
 import { CheckCircle2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
+const COUNTRY_CODES = [
+  { code: '+91', name: 'India' },
+  { code: '+1', name: 'USA/Canada' },
+  { code: '+44', name: 'UK' },
+  { code: '+61', name: 'Australia' },
+  { code: '+971', name: 'UAE' },
+  { code: '+65', name: 'Singapore' },
+  { code: '+49', name: 'Germany' },
+  { code: '+33', name: 'France' },
+  { code: '+81', name: 'Japan' },
+];
+
+
+
 export function Booking() {
   const dbRooms = useQuery(api.rooms.getAllRooms) || [];
   const roomsData = dbRooms.map(r => ({
@@ -62,6 +76,8 @@ export function Booking() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+
   
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -109,6 +125,9 @@ export function Booking() {
   const advance = total * 0.2; // 20% advance
   const balance = total - advance;
 
+  const today = new Date().toISOString().split('T')[0];
+
+
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
@@ -118,8 +137,9 @@ export function Booking() {
       await createBooking({
         roomId: selectedRoom as any,
         guestName: `${firstName.trim()} ${lastName.trim()}`,
-        guestPhone: phone,
+        guestPhone: `${countryCode}${phone}`,
         checkIn,
+
         checkOut,
         tariff: room.price,
         advance: advance,
@@ -244,9 +264,11 @@ export function Booking() {
                         <Input 
                           type="date" 
                           value={checkIn} 
+                          min={today}
                           onChange={(e) => setCheckIn(e.target.value)} 
                           className={errors.checkIn ? 'border-red-500' : ''}
                         />
+
                         {errors.checkIn && <p className="text-red-500 text-xs">{errors.checkIn}</p>}
                       </div>
                       <div className="space-y-2">
@@ -254,9 +276,11 @@ export function Booking() {
                         <Input 
                           type="date" 
                           value={checkOut} 
+                          min={checkIn || today}
                           onChange={(e) => setCheckOut(e.target.value)} 
                           className={errors.checkOut ? 'border-red-500' : ''}
                         />
+
                         {errors.checkOut && <p className="text-red-500 text-xs">{errors.checkOut}</p>}
                       </div>
                     </div>
@@ -319,15 +343,27 @@ export function Booking() {
 
                     <div className="space-y-2">
                       <Label>Phone Number</Label>
-                      <Input 
-                        type="tel" 
-                        placeholder="+1 (555) 000-0000" 
-                        value={phone} 
-                        onChange={(e) => setPhone(e.target.value)}
-                        className={errors.phone ? 'border-red-500' : ''}
-                      />
+                      <div className="flex gap-2">
+                        <select 
+                          value={countryCode} 
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          className="flex h-12 w-24 rounded-2xl border border-brand-brown/20 bg-brand-cream px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown"
+                        >
+                          {COUNTRY_CODES.map(c => (
+                            <option key={c.code} value={c.code}>{c.code}</option>
+                          ))}
+                        </select>
+                        <Input 
+                          type="tel" 
+                          placeholder="000-000-0000" 
+                          value={phone} 
+                          onChange={(e) => setPhone(e.target.value)}
+                          className={errors.phone ? 'border-red-500' : ''}
+                        />
+                      </div>
                       {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
                     </div>
+
 
                     <div className="space-y-2">
                       <Label>Special Requests (Optional)</Label>

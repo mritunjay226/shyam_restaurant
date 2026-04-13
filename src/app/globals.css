@@ -16,6 +16,9 @@
   /* Custom Marquee Animation */
   --animate-marquee: marquee 40s linear infinite;
 
+  /* Custom Breakpoints */
+  --breakpoint-nav: 1120px;
+
   @keyframes marquee {
     0% { transform: translateX(0); }
     100% { transform: translateX(-25%); }
