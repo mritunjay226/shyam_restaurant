@@ -1,6 +1,7 @@
 "use client"
 import Link from 'next/link';
 import { motion } from 'motion/react';
+// import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -16,15 +17,42 @@ export function Footer() {
             <h2 className="text-7xl md:text-9xl font-serif font-bold tracking-tighter mb-8">
               SHAYAM<span className="text-brand-red">.</span>
             </h2>
-            <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-colors text-xs font-bold">
-                FB
+            <div className="flex space-x-5">
+              <a 
+                href="https://facebook.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                aria-label="Facebook"
+              >
+                {/* <Facebook size={20} className="text-brand-cream/80 group-hover:text-white transition-colors" /> */}
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-colors text-xs font-bold">
-                IG
+              <a 
+                href="https://instagram.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                aria-label="Instagram"
+              >
+                {/* <Instagram size={20} className="text-brand-cream/80 group-hover:text-white transition-colors" /> */}
               </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-colors text-xs font-bold">
-                X
+              <a 
+                href="https://twitter.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                aria-label="Twitter"
+              >
+                {/* <Twitter size={20} className="text-brand-cream/80 group-hover:text-white transition-colors" /> */}
+              </a>
+              <a 
+                href="https://youtube.com" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                aria-label="Youtube"
+              >
+                {/* <Youtube size={20} className="text-brand-cream/80 group-hover:text-white transition-colors" /> */}
               </a>
             </div>
           </motion.div>

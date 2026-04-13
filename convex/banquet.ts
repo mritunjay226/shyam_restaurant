@@ -43,6 +43,7 @@ export const addHall = mutation({
     capacity: v.number(),
     price: v.number(),
     description: v.optional(v.string()),
+    image: v.optional(v.string()),
   },
   handler: async (ctx, args) =>
     ctx.db.insert("banquetHalls", { ...args, isActive: true }),
@@ -65,6 +66,7 @@ export const updateHall = mutation({
     capacity: v.optional(v.number()),
     price: v.optional(v.number()),
     description: v.optional(v.string()),
+    image: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { hallId, ...updates } = args;

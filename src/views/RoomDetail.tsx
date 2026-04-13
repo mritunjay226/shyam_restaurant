@@ -19,22 +19,47 @@ export function RoomDetail() {
   const id = params?.id as Id<"rooms">;
   const sysRoom = useQuery(api.rooms.getRoomById, id ? { roomId: id } : "skip");
   
-  const room = sysRoom ? {
-    id: sysRoom._id,
-    name: `Room ${sysRoom.roomNumber}`,
-    category: sysRoom.category,
-    price: sysRoom.tariff,
-    description: sysRoom.description || 'Experience comfort and elegance.',
-    amenities: sysRoom.amenities || ['King Size Bed', 'AC', 'Free WiFi', 'Smart TV'],
-    images: [
-      `https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop`,
-      `https://images.unsplash.com/photo-1582719478250-c89402bb17cb?q=80&w=800&auto=format&fit=crop`,
-      `https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop`,
-      `https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop`
-    ],
-    size: '350 sq ft',
-    bedType: '1 King Bed'
-  } : null;
+  const room = sysRoom ? (() => {
+    const catKey = sysRoom.category?.toLowerCase() || 'standard';
+    const fallbacks: Record<string, string[]> = {
+      luxury: [
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1582719478250-c89402bb17cb?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop',
+      ],
+      premium: [
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
+      ],
+      suite: [
+        'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=800&auto=format&fit=crop',
+      ],
+    };
+    const fallback = fallbacks[catKey] || fallbacks.luxury;
+
+    const imgArray: string[] = sysRoom.images && sysRoom.images.length > 0
+      ? sysRoom.images
+      : sysRoom.image
+        ? [sysRoom.image, ...fallback]
+        : fallback;
+
+    return {
+      id: sysRoom._id,
+      name: `Room ${sysRoom.roomNumber}`,
+      category: sysRoom.category,
+      price: sysRoom.tariff,
+      description: sysRoom.description || 'Experience comfort and elegance.',
+      amenities: sysRoom.amenities || ['King Size Bed', 'AC', 'Free WiFi', 'Smart TV'],
+      images: imgArray,
+      size: '350 sq ft',
+      bedType: '1 King Bed'
+    };
+  })() : null;
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -102,45 +127,52 @@ export function RoomDetail() {
               <p className="text-lg text-brand-brown/70 leading-relaxed">{room.description}</p>
             </div>
 
-            {/* Gallery */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Gallery: Product Style */}
+            <div className="space-y-4">
+              {/* Main Image View */}
               <div 
-                className="col-span-2 h-[400px] rounded-3xl overflow-hidden cursor-pointer group"
-                onClick={() => openModal(0)}
+                className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden cursor-pointer group bg-brand-cream-dark shadow-inner"
+                onClick={() => openModal(currentImageIndex)}
               >
-                <img 
-                  src={room.images[0]} 
-                  alt={`${room.name} Main`} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={currentImageIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    src={room.images[currentImageIndex]} 
+                    alt={`${room.name} View ${currentImageIndex + 1}`} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </AnimatePresence>
+                <div className="absolute inset-0 bg-brand-brown/5 group-hover:bg-transparent transition-colors" />
+                <div className="absolute bottom-6 right-6 bg-brand-cream/80 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold text-brand-brown shadow-sm border border-brand-brown/10 uppercase tracking-widest">
+                  View Fullscreen
+                </div>
               </div>
-              <div 
-                className="h-[250px] rounded-3xl overflow-hidden cursor-pointer group"
-                onClick={() => openModal(1)}
-              >
-                <img 
-                  src={room.images[1]} 
-                  alt={`${room.name} View 2`} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <div 
-                className="h-[250px] rounded-3xl overflow-hidden cursor-pointer group relative"
-                onClick={() => openModal(2)}
-              >
-                <img 
-                  src={room.images[2]} 
-                  alt={`${room.name} View 3`} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-                {room.images.length > 3 && (
-                  <div className="absolute inset-0 bg-brand-brown/40 flex items-center justify-center transition-opacity hover:bg-brand-brown/50">
-                    <span className="text-white font-medium text-lg tracking-widest uppercase">+{room.images.length - 3} More</span>
-                  </div>
-                )}
+
+              {/* Thumbnails Row */}
+              <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+                {room.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`relative w-24 h-24 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shrink-0 transition-all duration-300 border-2 ${
+                      currentImageIndex === idx 
+                        ? 'border-brand-red scale-95 shadow-md' 
+                        : 'border-transparent opacity-60 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <img 
+                      src={img} 
+                      alt={`${room.name} Thumbnail ${idx + 1}`} 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -167,7 +199,7 @@ export function RoomDetail() {
               <Card className="border-none shadow-xl bg-brand-cream-dark">
                 <CardContent className="p-8">
                   <div className="flex items-end gap-2 mb-8 pb-6 border-b border-brand-brown/10">
-                    <span className="text-5xl font-serif text-brand-brown">${room.price}</span>
+                    <span className="text-5xl font-serif text-brand-brown">₹{room.price}</span>
                     <span className="text-brand-brown/60 mb-1">/ night</span>
                   </div>
 

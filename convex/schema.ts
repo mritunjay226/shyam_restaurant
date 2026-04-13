@@ -12,6 +12,8 @@ export default defineSchema({
     status: v.string(),            // "available", "occupied", "pending_checkout"
     isActive: v.boolean(),
     description: v.optional(v.string()),
+    image: v.optional(v.string()),
+    images: v.optional(v.array(v.string())),
     amenities: v.optional(v.array(v.string())),
   }),
 
@@ -55,6 +57,7 @@ export default defineSchema({
     outlet: v.string(),
     isAvailable: v.boolean(),
     description: v.optional(v.string()),
+    image: v.optional(v.string()),
   }),
 
   // RESTAURANT / CAFE ORDERS
@@ -91,6 +94,7 @@ export default defineSchema({
     capacity: v.number(),
     price: v.optional(v.number()),
     description: v.optional(v.string()),
+    image: v.optional(v.string()),
     isActive: v.boolean(),
   }),
 

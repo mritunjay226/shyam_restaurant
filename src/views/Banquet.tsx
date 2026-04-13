@@ -13,20 +13,23 @@ import { Users, Check } from 'lucide-react';
 export function Banquet() {
   const dbHalls = useQuery(api.banquet.getAllHalls);
   
+  const HALL_FALLBACKS = [
+    'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop',
+  ];
+
   const banquetsData = (dbHalls || []).map((h, i) => ({
     id: h._id,
     name: h.name,
     capacity: h.capacity + ' Guests',
     price: h.price || 0,
-    image: [
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'
-    ][i % 4],
+    image: h.image || HALL_FALLBACKS[i % 4],
     description: h.description || 'A stunning venue designed to host your most memorable occasions.',
     amenities: ['Custom Seating', 'AV System', 'Full Catering', 'Private Staging']
   }));
+
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
@@ -119,7 +122,7 @@ export function Banquet() {
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 className="text-4xl font-serif text-brand-brown">{selectedHall.name}</h2>
                 <div className="bg-brand-cream text-brand-brown px-4 py-2 rounded-full font-semibold text-sm border border-brand-brown/10">
-                  Starting at ${selectedHall.price}
+                  Starting at ₹{selectedHall.price}
                 </div>
               </div>
               
