@@ -45,10 +45,12 @@ export function Booking() {
 
     // 3. Auto-skip to Step 2 if ALL necessary details are provided
     // This avoids the "double entry" problem reported by the user
-    if (rId && cin && cout) {
+    // Fixed: Only skip if we are on step 1 to prevent background pollings from resetting progress
+    if (rId && cin && cout && step === 1) {
       setStep(2);
     }
-  }, [roomsData, searchParams]);
+  }, [roomsData, searchParams, step]);
+
 
 
   // Form State
