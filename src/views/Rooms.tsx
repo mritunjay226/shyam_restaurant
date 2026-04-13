@@ -1,17 +1,33 @@
 "use client"
 import { useState } from 'react';
 import Link from 'next/link';
+
+
+
+
 import { motion } from 'motion/react';
-import { roomsData, RoomCategory } from '../data/dummy';
+import { RoomCategory } from '../data/dummy';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 
+import {
+  BedDouble, Maximize2, Filter
+} from 'lucide-react';
+
+
+
+
 export function Rooms() {
+
+
   const [filter, setFilter] = useState<RoomCategory | 'All'>('All');
   const dbRooms = useQuery(api.rooms.getAllRooms);
+
+
+
 
   if (dbRooms === undefined) {
     return (
@@ -101,19 +117,22 @@ export function Rooms() {
           </motion.p>
         </div>
 
-        {/* Filters */}
+
+        {/* Category Tabs */}
+
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((cat) => (
             <Button
               key={cat}
               variant={filter === cat ? 'default' : 'outline'}
               onClick={() => setFilter(cat as RoomCategory | 'All')}
-              className="min-w-[100px]"
+              className="min-w-[100px] rounded-full border-brand-brown/20"
             >
               {cat}
             </Button>
           ))}
         </div>
+
 
         {/* Room Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -149,19 +168,27 @@ export function Rooms() {
                     <CardDescription className="line-clamp-2 mb-6 grow text-brand-brown/60">
                       {room.description}
                     </CardDescription>
+                    
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-brand-brown/10">
-                      <div className="flex gap-2 text-brand-brown/60 text-sm italic">
-                        <span>{room.size}</span>
-                        <span>•</span>
-                        <span>{room.bedType}</span>
+                      <div className="flex flex-col">
+                        <div className="flex gap-2 text-brand-brown/60 text-[10px] italic">
+                          <span>{room.size}</span>
+                          <span>•</span>
+                          <span>{room.bedType}</span>
+                        </div>
                       </div>
-                      <span className="text-brand-red font-medium text-sm group-hover:translate-x-1 transition-transform inline-flex items-center">
+                      <div 
+                        className="bg-brand-red text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-brand-brown transition-colors cursor-pointer"
+                      >
                         Details →
-                      </span>
+                      </div>
+
+
                     </div>
                   </CardContent>
                 </Card>
               </Link>
+
             </motion.div>
           ))}
         </div>

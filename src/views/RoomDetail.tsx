@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { roomsData } from '../data/dummy';
@@ -63,6 +63,23 @@ export function RoomDetail() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const router = useRouter();
+  const [formState, setFormState] = useState({
+    checkIn: '',
+    checkOut: '',
+    guests: '2 Adults'
+  });
+
+  const handleBookNow = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = new URLSearchParams({
+      roomId: id,
+      ...formState
+    }).toString();
+    router.push(`/booking?${query}`);
+  };
+
 
   if (sysRoom === undefined) {
     return (
@@ -203,21 +220,38 @@ export function RoomDetail() {
                     <span className="text-brand-brown/60 mb-1">/ night</span>
                   </div>
 
-                  <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); window.location.href='/booking'; }}>
+                  <form className="space-y-6" onSubmit={handleBookNow}>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="checkin">Check-in</Label>
-                        <Input id="checkin" type="date" required />
+                        <Input 
+                          id="checkin" 
+                          type="date" 
+                          required 
+                          value={formState.checkIn}
+                          onChange={(e) => setFormState({ ...formState, checkIn: e.target.value })}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="checkout">Check-out</Label>
-                        <Input id="checkout" type="date" required />
+                        <Input 
+                          id="checkout" 
+                          type="date" 
+                          required 
+                          value={formState.checkOut}
+                          onChange={(e) => setFormState({ ...formState, checkOut: e.target.value })}
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="guests">Guests</Label>
-                      <select id="guests" className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown">
+                      <select 
+                        id="guests" 
+                        className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown"
+                        value={formState.guests}
+                        onChange={(e) => setFormState({ ...formState, guests: e.target.value })}
+                      >
                         <option>1 Adult</option>
                         <option>2 Adults</option>
                         <option>2 Adults, 1 Child</option>
@@ -227,6 +261,7 @@ export function RoomDetail() {
                     <Button type="submit" variant="gold" className="w-full py-6 text-sm uppercase tracking-widest font-semibold transition-all duration-300 active:scale-95">
                       Book This Room
                     </Button>
+
                     <p className="text-xs text-center text-brand-brown/60 mt-4">
                       You won't be charged yet.
                     </p>

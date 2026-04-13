@@ -4,7 +4,11 @@ import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { ArrowDown, BedDouble, UtensilsCrossed, Coffee, PartyPopper, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import {
+  ArrowDown, BedDouble, UtensilsCrossed, Coffee, PartyPopper,
+  ChevronLeft, ChevronRight, Phone, Mail, MapPin
+} from 'lucide-react';
+
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
@@ -18,6 +22,7 @@ export function Home() {
   const dbRestaurantItems = useQuery(api.menuItems.getMenuByOutlet, { outlet: 'restaurant' });
 
   const scroll = (direction: 'left' | 'right') => {
+
     if (carouselRef.current) {
       const { scrollLeft, clientWidth } = carouselRef.current;
       const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
@@ -34,29 +39,29 @@ export function Home() {
   ];
 
   const glimpses = [
-    { 
-      name: 'Luxury Stay', 
-      img: dbRooms?.[0]?.images?.[0] || dbRooms?.[0]?.image || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Luxury Stay',
+      img: dbRooms?.[0]?.images?.[0] || dbRooms?.[0]?.image || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600&auto=format&fit=crop'
     },
-    { 
-      name: 'Fine Dining', 
-      img: dbRestaurantItems?.[0]?.image || 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Fine Dining',
+      img: dbRestaurantItems?.[0]?.image || 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=600&auto=format&fit=crop'
     },
-    { 
-      name: 'Artisan Coffee', 
-      img: dbCafeItems?.[0]?.image || 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Artisan Coffee',
+      img: dbCafeItems?.[0]?.image || 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=600&auto=format&fit=crop'
     },
-    { 
-      name: 'Elegant Events', 
-      img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Elegant Events',
+      img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=600&auto=format&fit=crop'
     },
-    { 
-      name: 'Cozy Corners', 
-      img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Cozy Corners',
+      img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600&auto=format&fit=crop'
     },
-    { 
-      name: 'Culinary Art', 
-      img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop' 
+    {
+      name: 'Culinary Art',
+      img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop'
     },
   ];
 
@@ -74,36 +79,36 @@ export function Home() {
             A Haven of <strong className="mx-1">Luxury.</strong> A World of <strong className="ml-1">Taste.</strong>
           </Badge>
         </div>
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-5xl sm:text-6xl md:text-8xl lg:text-[8.5rem] font-serif text-brand-brown mb-12 md:mb-16 max-w-6xl mx-auto leading-[1.05] md:leading-[0.95] tracking-tight px-4"
         >
           Experience the <br className="hidden sm:block" /> Art of Hospitality
         </motion.h1>
-        
+
         <div className="relative w-full">
           <div className="absolute -top-12 md:-top-16 left-1/2 -translate-x-1/2 z-20">
             <Link href="/rooms" className="w-24 h-24 md:w-32 md:h-32 bg-brand-red rounded-full text-white flex flex-col items-center justify-center border-4 md:border-[6px] border-brand-cream hover:scale-105 transition-transform shadow-lg">
               <ArrowDown className="mb-1 w-4 h-4 md:w-5 md:h-5" />
-              <span className="text-[8px] md:text-[9px] uppercase tracking-widest text-center px-4 font-bold leading-tight mt-1">Book Your<br className="hidden md:block"/>Stay</span>
+              <span className="text-[8px] md:text-[9px] uppercase tracking-widest text-center px-4 font-bold leading-tight mt-1">Book Your<br className="hidden md:block" />Stay</span>
             </Link>
           </div>
           <div className="relative w-full h-[60vh] md:h-[70vh] overflow-hidden">
             <motion.div style={{ y: heroY }} className="absolute inset-0 w-full h-[120%] -top-[10%]">
-              <motion.img 
-                animate={{ 
+              <motion.img
+                animate={{
                   scale: [1.1, 1.2, 1.1],
                   x: ["0%", "-2%", "0%"],
                   y: ["0%", "2%", "0%"]
                 }}
-                transition={{ 
-                  duration: 20, 
+                transition={{
+                  duration: 20,
                   ease: "easeInOut",
-                  repeat: Infinity 
+                  repeat: Infinity
                 }}
-                src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776095845/ChatGPT_Image_Apr_13_2026_09_19_41_PM_1_1_lgr5fv.png" 
-                alt="Luxury Hotel Exterior" 
+                src="https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776095845/ChatGPT_Image_Apr_13_2026_09_19_41_PM_1_1_lgr5fv.png"
+                alt="Luxury Hotel Exterior"
                 className="w-full h-full object-cover bg-bottom"
                 referrerPolicy="no-referrer"
               />
@@ -112,9 +117,11 @@ export function Home() {
         </div>
       </section>
 
+
+
       {/* About Section */}
       <section id="about" className="py-24 px-4 md:px-12 bg-brand-cream overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -143,9 +150,9 @@ export function Home() {
           </div>
           <div className="flex-1 flex justify-end">
             <div className="relative">
-              <img 
-                src="https://res.cloudinary.com/diah8zonu/image/upload/v1776090129/shyam-hotel/qfsqnmyhsjja0uvilffn.jpg" 
-                alt="Luxury Suite" 
+              <img
+                src="https://res.cloudinary.com/diah8zonu/image/upload/v1776090129/shyam-hotel/qfsqnmyhsjja0uvilffn.jpg"
+                alt="Luxury Suite"
                 className="rounded-3xl w-full max-w-md object-cover shadow-xl"
                 referrerPolicy="no-referrer"
               />
@@ -159,7 +166,7 @@ export function Home() {
 
       {/* The Four Pillars (Replaces Bento Grid) */}
       <section id="spaces" className="py-24 px-4 md:px-12 bg-brand-cream-dark overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -169,7 +176,7 @@ export function Home() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full border border-brand-brown/20 flex items-center justify-center rotate-12 bg-brand-cream">
-                 <span className="text-2xl">✨</span>
+                <span className="text-2xl">✨</span>
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-brown tracking-tight">Discover our spaces</h2>
             </div>
@@ -179,7 +186,7 @@ export function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             {/* Rooms */}
             <Link href="/rooms" className="group relative h-[400px] rounded-3xl overflow-hidden block">
               <img src={roomLandingImg} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" alt="Luxury Rooms" />
@@ -262,7 +269,7 @@ export function Home() {
 
       {/* Amenities & Ambiance Carousel */}
       <section className="py-24 px-4 md:px-12 bg-brand-cream overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -283,9 +290,9 @@ export function Home() {
               </button>
             </div>
           </div>
-          
+
           <div className="relative -mx-4 md:-mx-12 px-4 md:px-12">
-            <div 
+            <div
               ref={carouselRef}
               className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 pb-8"
             >
@@ -306,7 +313,7 @@ export function Home() {
 
       {/* Testimonials Section */}
       <section className="py-24 px-4 md:px-12 bg-brand-cream border-t border-brand-brown/5 overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -321,7 +328,7 @@ export function Home() {
               Where every visit becomes a great memory
             </h2>
           </div>
-          
+
           <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1 */}
             <div className="bg-brand-cream-dark p-8 rounded-3xl flex flex-col justify-between">
@@ -376,7 +383,7 @@ export function Home() {
 
       {/* Plan Your Visit Section */}
       <section className="py-24 px-4 md:px-12 bg-brand-cream overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -386,7 +393,7 @@ export function Home() {
           <div className="flex-1">
             <Badge variant="outline" className="mb-8 border-brand-brown/30">Plan Your Visit</Badge>
             <h2 className="text-4xl sm:text-5xl md:text-7xl font-serif text-brand-brown mb-8 md:mb-10 leading-tight tracking-tight">
-              Ready to experience <br className="hidden md:block"/> the ultimate joy?
+              Ready to experience <br className="hidden md:block" /> the ultimate joy?
             </h2>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/booking" className="w-full sm:w-auto">
@@ -407,7 +414,7 @@ export function Home() {
 
       {/* Contact Section */}
       <section id="contact" className="py-24 px-4 md:px-12 bg-brand-cream-dark overflow-hidden">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -419,7 +426,7 @@ export function Home() {
           <p className="text-brand-brown/70 mb-12 md:mb-16 max-w-2xl mx-auto text-base md:text-lg px-4 md:px-0">
             Our concierge team is available 24/7 to help you with your reservation, arrange special requests, or answer any questions you may have about your stay.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center p-10 bg-brand-cream rounded-3xl shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-brand-red/10 rounded-full flex items-center justify-center mb-6 text-brand-red">
@@ -428,7 +435,7 @@ export function Home() {
               <h4 className="font-serif text-2xl text-brand-brown mb-3">Call Us</h4>
               <p className="text-brand-brown/70 text-lg">+91 98765 43210</p>
             </div>
-            
+
             <div className="flex flex-col items-center p-10 bg-brand-cream rounded-3xl shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-brand-red/10 rounded-full flex items-center justify-center mb-6 text-brand-red">
                 <Mail size={28} />
@@ -436,7 +443,7 @@ export function Home() {
               <h4 className="font-serif text-2xl text-brand-brown mb-3">Email Us</h4>
               <p className="text-brand-brown/70 text-lg">reservations@shayam.com</p>
             </div>
-            
+
             <div className="flex flex-col items-center p-10 bg-brand-cream rounded-3xl shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-brand-red/10 rounded-full flex items-center justify-center mb-6 text-brand-red">
                 <MapPin size={28} />
@@ -445,9 +452,9 @@ export function Home() {
               <p className="text-brand-brown/70 text-lg text-center">1, MG Marg, Opp. Gate No. 4<br />High Court, Civil Lines, Prayagraj</p>
             </div>
           </div>
-          
+
           <div className="mt-16 md:mt-24 w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-lg relative border-[6px] border-white">
-            <iframe 
+            <iframe
               title="Google Maps Location"
               src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Shyam%20Restaurant,+Mahatma%20Gandhi%20Marg,+Opposite+Gate+No.+4,+High+Court,+Civil+Lines,+Prayagraj,+Uttar+Pradesh&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
               className="absolute inset-0 w-full h-full border-0"
@@ -456,15 +463,15 @@ export function Home() {
               referrerPolicy="no-referrer-when-downgrade"
             ></iframe>
             <div className="absolute top-4 left-4 right-4 md:right-auto md:w-80 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl flex items-start gap-4">
-               <div className="bg-brand-red p-3 rounded-full text-white shrink-0 mt-1">
-                 <MapPin size={20} />
-               </div>
-               <div className="text-left">
-                 <p className="font-bold text-brand-brown mb-1">Shyam Restaurant</p>
-                 <a href="https://share.google/6Fa6U7FI6DccQbDtW" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline font-medium">
-                   View on Google Maps &rarr;
-                 </a>
-               </div>
+              <div className="bg-brand-red p-3 rounded-full text-white shrink-0 mt-1">
+                <MapPin size={20} />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-brand-brown mb-1">Shyam Restaurant</p>
+                <a href="https://share.google/6Fa6U7FI6DccQbDtW" target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline font-medium">
+                  View on Google Maps &rarr;
+                </a>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -476,7 +483,7 @@ export function Home() {
           <Badge className="border-brand-cream/20 text-brand-cream mb-6 md:mb-8 text-xs px-4 py-1.5">A Feast for the Eyes</Badge>
           <h2 className="text-3xl sm:text-4xl md:text-6xl font-serif text-brand-cream tracking-tight">Glimpses of Shayam Hotel</h2>
         </div>
-        
+
         <div className="relative w-full overflow-hidden py-10">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-8 px-4">
             {marqueeItems.map((item, i) => {
@@ -484,13 +491,13 @@ export function Home() {
               const margins = ['mt-12', 'mt-0', 'mt-8', 'mt-4', 'mt-16', 'mt-0'];
               const rot = rotations[i % rotations.length];
               const mt = margins[i % margins.length];
-              
+
               return (
                 <div key={i} className={`relative ${rot} ${mt} transition-transform hover:scale-105 hover:z-20 cursor-pointer shrink-0`}>
                   <div className="bg-brand-cream p-3 pb-10 md:pb-12 rounded-xl shadow-2xl">
-                    <img 
-                      src={item.img} 
-                      className="w-48 md:w-64 h-64 md:h-80 object-cover rounded-lg" 
+                    <img
+                      src={item.img}
+                      className="w-48 md:w-64 h-64 md:h-80 object-cover rounded-lg"
                       alt={item.name}
                       referrerPolicy="no-referrer"
                     />

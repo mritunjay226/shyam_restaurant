@@ -8,6 +8,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { CheckCircle2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export function Booking() {
   const dbRooms = useQuery(api.rooms.getAllRooms) || [];
@@ -23,11 +24,32 @@ export function Booking() {
   const [selectedRoom, setSelectedRoom] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
-    if (roomsData.length > 0 && !selectedRoom) {
+    // 1. Parse URL parameters
+    const rId = searchParams.get('roomId');
+    const cin = searchParams.get('checkIn');
+    const cout = searchParams.get('checkOut');
+    const g = searchParams.get('guests');
+
+    if (rId) setSelectedRoom(rId);
+    if (cin) setCheckIn(cin);
+    if (cout) setCheckOut(cout);
+    if (g) setGuests(g);
+
+    // 2. Initial room set from DB if not provided in URL
+    if (roomsData.length > 0 && !selectedRoom && !rId) {
       setSelectedRoom(roomsData[0].id);
     }
-  }, [roomsData, selectedRoom]);
+
+    // 3. Auto-skip to Step 2 if ALL necessary details are provided
+    // This avoids the "double entry" problem reported by the user
+    if (rId && cin && cout) {
+      setStep(2);
+    }
+  }, [roomsData, searchParams]);
+
 
   // Form State
   const [checkIn, setCheckIn] = useState('');
