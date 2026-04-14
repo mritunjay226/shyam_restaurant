@@ -40,6 +40,17 @@ export function Booking() {
 
   const searchParams = useSearchParams();
 
+  // Form State
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState('2 Adults');
+  
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+
   useEffect(() => {
     // 1. Parse URL parameters
     const rId = searchParams.get('roomId');
@@ -64,19 +75,6 @@ export function Booking() {
       setStep(2);
     }
   }, [roomsData, searchParams, step, selectedRoom, checkIn, checkOut, guests, firstName]);
-
-
-
-  // Form State
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState('2 Adults');
-  
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryCode, setCountryCode] = useState('+91');
 
   
   const [errors, setErrors] = useState<Record<string, string>>({});
