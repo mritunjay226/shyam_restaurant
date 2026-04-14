@@ -47,23 +47,23 @@ export function Booking() {
     const cout = searchParams.get('checkOut');
     const g = searchParams.get('guests');
 
-    if (rId) setSelectedRoom(rId);
-    if (cin) setCheckIn(cin);
-    if (cout) setCheckOut(cout);
-    if (g) setGuests(g);
+    // Only set if current value is empty - this prevents background re-renders 
+    // from overriding user's manual selections
+    if (rId && !selectedRoom) setSelectedRoom(rId);
+    if (cin && !checkIn) setCheckIn(cin);
+    if (cout && !checkOut) setCheckOut(cout);
+    if (g && guests === '2 Adults') setGuests(g); // '2 Adults' is the default
 
-    // 2. Initial room set from DB if not provided in URL
+    // 2. Initial room set from DB if not provided in URL and nothing selected
     if (roomsData.length > 0 && !selectedRoom && !rId) {
       setSelectedRoom(roomsData[0].id);
     }
 
-    // 3. Auto-skip to Step 2 if ALL necessary details are provided
-    // This avoids the "double entry" problem reported by the user
-    // Fixed: Only skip if we are on step 1 to prevent background pollings from resetting progress
-    if (rId && cin && cout && step === 1) {
+    // 3. Auto-skip to Step 2 if ALL necessary details are provided initially
+    if (rId && cin && cout && step === 1 && !firstName) {
       setStep(2);
     }
-  }, [roomsData, searchParams, step]);
+  }, [roomsData, searchParams, step, selectedRoom, checkIn, checkOut, guests, firstName]);
 
 
 

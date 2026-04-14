@@ -63,6 +63,10 @@ export function Home() {
       name: 'Culinary Art',
       img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop'
     },
+    {
+      name: 'Culinary Art',
+      img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop'
+    },
   ];
 
   // Also update the Spaces images to use real first room if available
