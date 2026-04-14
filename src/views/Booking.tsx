@@ -33,15 +33,14 @@ export function Booking() {
     price: r.tariff
   }));
 
+  const [selectedRoom, setSelectedRoom] = useState<string>('');
+  const [step, setStep] = useState(1);
+  const createBooking = useMutation(api.bookings.createBooking);
+
   // Fetch bookings for the selected room to disable taken dates
   const roomBookings = useQuery(api.bookings.getBookingsByRoom, 
     selectedRoom ? { roomId: selectedRoom as any } : "skip"
   ) || [];
-
-  const createBooking = useMutation(api.bookings.createBooking);
-
-  const [step, setStep] = useState(1);
-  const [selectedRoom, setSelectedRoom] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   const searchParams = useSearchParams();
