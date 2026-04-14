@@ -1,5 +1,11 @@
 import { Suspense } from 'react'
-import { Booking } from '@/views/Booking'
+import { Metadata } from 'next';
+import { Booking } from '@/views/Booking';
+
+export const metadata: Metadata = {
+  title: "Book Your Stay | Shyam Hotel & Restaurant Prayagraj",
+  description: "Fast and easy room booking at Shyam Hotel & Restaurant. Plan your stay in the heart of Civil Lines, Prayagraj today.",
+};
 
 export default function BookingPage() {
   return (
