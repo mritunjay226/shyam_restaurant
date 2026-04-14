@@ -5,8 +5,8 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon, X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { motion, AnimatePresence } from "motion/react"
 
 interface DatePickerProps {
     date?: Date
@@ -36,31 +36,57 @@ export function DatePicker({ date, setDate, label, disabled, min }: DatePickerPr
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-            "flex h-12 w-full items-center justify-between rounded-full border border-brand-brown/20 bg-brand-cream px-4 py-2 text-sm cursor-pointer hover:border-brand-brown/40 transition-colors",
-            !date && "text-brand-brown/40"
+            "group flex h-12 w-full items-center justify-between rounded-full border border-brand-brown/10 bg-brand-cream/80 backdrop-blur-sm px-5 py-2 text-sm cursor-pointer shadow-sm hover:shadow-md hover:border-brand-brown/30 transition-all duration-300",
+            !date && "text-brand-brown/40",
+            isOpen && "ring-2 ring-brand-brown/10 border-brand-brown/40"
         )}
       >
-        <span className="truncate">
-            {date ? format(date, "PPP") : (label || "Pick a date")}
-        </span>
-        <CalendarIcon className="h-4 w-4 text-brand-brown/40" />
+        <div className="flex items-center gap-3 overflow-hidden">
+            <CalendarIcon className={cn(
+                "h-4 w-4 shrink-0 transition-transform duration-300",
+                isOpen ? "scale-110 text-brand-red" : "text-brand-brown/40 group-hover:text-brand-brown"
+            )} />
+            <span className="truncate font-medium">
+                {date ? format(date, "PPP") : (label || "Pick a date")}
+            </span>
+        </div>
+        
+        {date && (
+            <button 
+                onClick={(e) => {
+                    e.stopPropagation()
+                    setDate(undefined)
+                }}
+                className="p-1 hover:bg-brand-red/10 rounded-full transition-colors text-brand-brown/40 hover:text-brand-red"
+            >
+                <X size={14} />
+            </button>
+        )}
       </div>
 
-      {isOpen && (
-        <div className="absolute top-14 left-0 z-50 animate-in fade-in zoom-in duration-200 origin-top-left">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={(d) => {
-                setDate(d)
-                setIsOpen(false)
-            }}
-            disabled={disabled}
-            fromDate={min}
-            initialFocus
-          />
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+            <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 4, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className="absolute top-14 left-0 z-100 origin-top-left"
+            >
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(d) => {
+                        setDate(d)
+                        setIsOpen(false)
+                    }}
+                    disabled={disabled}
+                    fromDate={min}
+                    initialFocus
+                />
+            </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

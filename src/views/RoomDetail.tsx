@@ -1,9 +1,8 @@
 "use client"
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { roomsData } from '../data/dummy';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
@@ -13,12 +12,47 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Check, ArrowLeft, X, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from 'lucide-react';
+import { DatePicker } from '../components/ui/date-picker';
+import { addDays, format, parseISO, startOfDay, eachDayOfInterval } from 'date-fns';
 
 export function RoomDetail() {
   const params = useParams();
   const id = params?.id as Id<"rooms">;
   const sysRoom = useQuery(api.rooms.getRoomById, id ? { roomId: id } : "skip");
   
+  // Fetch bookings for this specific room to disable taken dates
+  const roomBookings = useQuery(api.bookings.getBookingsByRoom, 
+    id ? { roomId: id } : "skip"
+  ) || [];
+
+  const [formState, setFormState] = useState({
+    checkIn: '',
+    checkOut: '',
+    guests: '2 Adults'
+  });
+
+  // Compute disabled dates for the calendar
+  const disabledDates = React.useMemo(() => {
+    const dates: any[] = [{ before: startOfDay(new Date()) }]; // Always disable past
+    
+    roomBookings.forEach(b => {
+      if (b.status !== 'cancelled' && b.status !== 'checked_out') {
+        const start = parseISO(b.checkIn);
+        const end = parseISO(b.checkOut);
+        
+        try {
+          const days = eachDayOfInterval({ start, end });
+          days.pop(); // Departure day is free
+          dates.push(...days);
+        } catch (e) {
+          dates.push({ from: start, to: end });
+        }
+      }
+    });
+
+    return dates;
+  }, [roomBookings]);
+
   const room = sysRoom ? (() => {
     const catKey = sysRoom.category?.toLowerCase() || 'standard';
     const fallbacks: Record<string, string[]> = {
@@ -65,11 +99,6 @@ export function RoomDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const router = useRouter();
-  const [formState, setFormState] = useState({
-    checkIn: '',
-    checkOut: '',
-    guests: '2 Adults'
-  });
 
   const handleBookNow = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,24 +253,22 @@ export function RoomDetail() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="checkin">Check-in</Label>
-                        <Input 
-                          id="checkin" 
-                          type="date" 
-                          required 
-                          min={new Date().toISOString().split('T')[0]}
-                          value={formState.checkIn}
-                          onChange={(e) => setFormState({ ...formState, checkIn: e.target.value })}
+                        <DatePicker 
+                          date={formState.checkIn ? new Date(formState.checkIn) : undefined} 
+                          setDate={(d) => setFormState({ ...formState, checkIn: d ? d.toISOString().split('T')[0] : '' })}
+                          label="Select Check-in"
+                          min={new Date()}
+                          disabled={disabledDates}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="checkout">Check-out</Label>
-                        <Input 
-                          id="checkout" 
-                          type="date" 
-                          required 
-                          min={formState.checkIn || new Date().toISOString().split('T')[0]}
-                          value={formState.checkOut}
-                          onChange={(e) => setFormState({ ...formState, checkOut: e.target.value })}
+                        <DatePicker 
+                          date={formState.checkOut ? new Date(formState.checkOut) : undefined} 
+                          setDate={(d) => setFormState({ ...formState, checkOut: d ? d.toISOString().split('T')[0] : '' })}
+                          label="Select Check-out"
+                          min={formState.checkIn ? new Date(formState.checkIn) : new Date()}
+                          disabled={disabledDates}
                         />
                       </div>
                     </div>
