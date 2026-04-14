@@ -9,6 +9,7 @@ import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { CheckCircle2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import { DatePicker } from '../components/ui/date-picker';
 
 const COUNTRY_CODES = [
   { code: '+91', name: 'India' },
@@ -32,6 +33,11 @@ export function Booking() {
     price: r.tariff
   }));
 
+  // Fetch bookings for the selected room to disable taken dates
+  const roomBookings = useQuery(api.bookings.getBookingsByRoom, 
+    selectedRoom ? { roomId: selectedRoom as any } : "skip"
+  ) || [];
+
   const createBooking = useMutation(api.bookings.createBooking);
 
   const [step, setStep] = useState(1);
@@ -50,6 +56,22 @@ export function Booking() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
+
+  // Compute disabled dates for the calendar
+  const disabledDates = React.useMemo(() => {
+    const dates: any[] = [{ before: new Date() }]; // Always disable past
+    
+    roomBookings.forEach(b => {
+      if (b.status !== 'cancelled' && b.status !== 'checked_out') {
+        dates.push({
+          from: new Date(b.checkIn),
+          to: new Date(b.checkOut)
+        });
+      }
+    });
+
+    return dates;
+  }, [roomBookings]);
 
   useEffect(() => {
     // 1. Parse URL parameters
@@ -259,24 +281,24 @@ export function Booking() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Check-in Date</Label>
-                        <Input 
-                          type="date" 
-                          value={checkIn} 
-                          min={today}
-                          onChange={(e) => setCheckIn(e.target.value)} 
-                          className={errors.checkIn ? 'border-red-500' : ''}
+                        <DatePicker 
+                          date={checkIn ? new Date(checkIn) : undefined} 
+                          setDate={(d) => setCheckIn(d ? d.toISOString().split('T')[0] : '')}
+                          label="Select Check-in"
+                          min={new Date()}
+                          disabled={disabledDates}
                         />
 
                         {errors.checkIn && <p className="text-red-500 text-xs">{errors.checkIn}</p>}
                       </div>
                       <div className="space-y-2">
                         <Label>Check-out Date</Label>
-                        <Input 
-                          type="date" 
-                          value={checkOut} 
-                          min={checkIn || today}
-                          onChange={(e) => setCheckOut(e.target.value)} 
-                          className={errors.checkOut ? 'border-red-500' : ''}
+                        <DatePicker 
+                          date={checkOut ? new Date(checkOut) : undefined} 
+                          setDate={(d) => setCheckOut(d ? d.toISOString().split('T')[0] : '')}
+                          label="Select Check-out"
+                          min={checkIn ? new Date(checkIn) : new Date()}
+                          disabled={disabledDates}
                         />
 
                         {errors.checkOut && <p className="text-red-500 text-xs">{errors.checkOut}</p>}
