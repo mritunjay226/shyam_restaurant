@@ -14,9 +14,10 @@ interface DatePickerProps {
     label?: string
     disabled?: any
     min?: Date
+    align?: "left" | "right"
 }
 
-export function DatePicker({ date, setDate, label, disabled, min }: DatePickerProps) {
+export function DatePicker({ date, setDate, label, disabled, min, align = "left" }: DatePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const containerRef = React.useRef<HTMLDivElement>(null)
 
@@ -41,7 +42,7 @@ export function DatePicker({ date, setDate, label, disabled, min }: DatePickerPr
             isOpen && "ring-2 ring-brand-brown/10 border-brand-brown/40"
         )}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
+        <div className="flex items-center gap-3 overflow-hidden text-brand-brown">
             <CalendarIcon className={cn(
                 "h-4 w-4 shrink-0 transition-transform duration-300",
                 isOpen ? "scale-110 text-brand-red" : "text-brand-brown/40 group-hover:text-brand-brown"
@@ -71,7 +72,11 @@ export function DatePicker({ date, setDate, label, disabled, min }: DatePickerPr
                 animate={{ opacity: 1, y: 4, scale: 1 }}
                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                className="absolute top-14 left-0 z-100 origin-top-left"
+                className={cn(
+                    "absolute top-14 z-100 min-w-max",
+                    align === "left" ? "left-0 origin-top-left" : "right-0 origin-top-right",
+                    "max-w-[95vw] sm:max-w-none"
+                )}
             >
                 <Calendar
                     mode="single"
@@ -83,6 +88,7 @@ export function DatePicker({ date, setDate, label, disabled, min }: DatePickerPr
                     disabled={disabled}
                     fromDate={min}
                     initialFocus
+                    className="w-min border shadow-2xl"
                 />
             </motion.div>
         )}

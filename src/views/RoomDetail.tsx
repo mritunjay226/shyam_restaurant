@@ -250,7 +250,7 @@ export function RoomDetail() {
                   </div>
 
                   <form className="space-y-6" onSubmit={handleBookNow}>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="checkin">Check-in</Label>
                         <DatePicker 
@@ -269,6 +269,7 @@ export function RoomDetail() {
                           label="Select Check-out"
                           min={formState.checkIn ? new Date(formState.checkIn) : new Date()}
                           disabled={disabledDates}
+                          align="right"
                         />
                       </div>
                     </div>

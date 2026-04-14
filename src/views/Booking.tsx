@@ -292,7 +292,7 @@ export function Booking() {
                       </Select>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Check-in Date</Label>
                         <DatePicker 
@@ -313,6 +313,7 @@ export function Booking() {
                           label="Select Check-out"
                           min={checkIn ? new Date(checkIn) : new Date()}
                           disabled={disabledDates}
+                          align="right"
                         />
 
                         {errors.checkOut && <p className="text-red-500 text-xs">{errors.checkOut}</p>}
