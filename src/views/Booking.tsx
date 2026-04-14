@@ -10,6 +10,7 @@ import { Select } from '../components/ui/select';
 import { CheckCircle2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { DatePicker } from '../components/ui/date-picker';
+import { addDays, format, parseISO, startOfDay, eachDayOfInterval } from 'date-fns';
 
 const COUNTRY_CODES = [
   { code: '+91', name: 'India' },
@@ -58,14 +59,28 @@ export function Booking() {
 
   // Compute disabled dates for the calendar
   const disabledDates = React.useMemo(() => {
-    const dates: any[] = [{ before: new Date() }]; // Always disable past
+    const dates: any[] = [{ before: startOfDay(new Date()) }]; // Always disable past
     
     roomBookings.forEach(b => {
       if (b.status !== 'cancelled' && b.status !== 'checked_out') {
-        dates.push({
-          from: new Date(b.checkIn),
-          to: new Date(b.checkOut)
-        });
+        const start = parseISO(b.checkIn);
+        const end = parseISO(b.checkOut);
+        
+        // Add all days in the range to the disabled list
+        // Note: For hotel bookings, the 'checkOut' day is usually the day to check-in
+        // for the next guest. So we only disable UP TO checkOut - 1 day for arrivals.
+        // However, react-day-picker disabled dates are day-based. 
+        // We'll disable the whole interval for simplicity first, then refine.
+        try {
+          const days = eachDayOfInterval({ start, end });
+          // But wait, the day of departure is NOT occupied for the next guest
+          // So we remove the last day from the disabled list
+          days.pop(); 
+          dates.push(...days);
+        } catch (e) {
+          // Fallback to simple range if interval fails
+          dates.push({ from: start, to: end });
+        }
       }
     });
 
