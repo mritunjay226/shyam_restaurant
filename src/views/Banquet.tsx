@@ -8,7 +8,8 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
-import { Users, Check } from 'lucide-react';
+import { Users, Check, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export function Banquet() {
   const dbHalls = useQuery(api.banquet.getAllHalls);
@@ -89,17 +90,24 @@ export function Banquet() {
               onClick={() => setSelectedId(hall.id)}
               className="cursor-pointer"
             >
-              <Card className={`overflow-hidden transition-all duration-300 ${selectedHall.id === hall.id ? 'ring-2 ring-brand-red shadow-lg' : 'hover:shadow-md border-transparent'} bg-brand-cream-dark`}>
-                <div className="h-40 overflow-hidden rounded-t-3xl">
-                  <img src={hall.image} alt={hall.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-serif font-semibold text-brand-brown mb-1 text-lg">{hall.name}</h3>
-                  <div className="flex items-center text-sm text-brand-brown/60">
-                    <Users size={14} className="mr-1" /> {hall.capacity}
+              <Link href={`/banquet/${hall.id}`}>
+                <Card className={`overflow-hidden group transition-all duration-300 ${selectedHall.id === hall.id ? 'ring-2 ring-brand-red shadow-lg' : 'hover:shadow-md border-transparent'} bg-brand-cream-dark`}>
+                  <div className="h-40 overflow-hidden rounded-t-3xl relative">
+                    <img src={hall.image} alt={hall.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" referrerPolicy="no-referrer" />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                       <span className="bg-brand-cream/90 px-4 py-2 rounded-full text-xs font-bold text-brand-brown uppercase tracking-widest flex items-center gap-2">
+                        View Details <ArrowRight size={14} />
+                       </span>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                  <CardContent className="p-4">
+                    <h3 className="font-serif font-semibold text-brand-brown mb-1 text-lg">{hall.name}</h3>
+                    <div className="flex items-center text-sm text-brand-brown/60">
+                      <Users size={14} className="mr-1" /> {hall.capacity}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>

@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as banquet from "../banquet.js";
+import type * as banquetMenu from "../banquetMenu.js";
 import type * as billing from "../billing.js";
 import type * as bookings from "../bookings.js";
 import type * as menuItems from "../menuItems.js";
@@ -29,6 +30,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   banquet: typeof banquet;
+  banquetMenu: typeof banquetMenu;
   billing: typeof billing;
   bookings: typeof bookings;
   menuItems: typeof menuItems;
