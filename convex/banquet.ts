@@ -145,7 +145,8 @@ export const createBanquetBooking = mutation({
       }
     }
 
-    return ctx.db.insert("banquetBookings", {
+    // ── 5. CREATE BOOKING ─────────────────────────────────────────
+    const bookingId = await ctx.db.insert("banquetBookings", {
       hallId: args.hallId,
       eventName: args.eventName,
       eventType: args.eventType,
@@ -162,6 +163,25 @@ export const createBanquetBooking = mutation({
       status: "confirmed",
       notes: args.notes,
     });
+
+    // ── 6. RECORD ADVANCE PAYMENT IN BILLS (shows in revenue) ─────
+    if (args.advance > 0) {
+      await ctx.db.insert("bills", {
+        billType: "banquet",
+        referenceId: bookingId as string,
+        guestName: args.guestName,
+        isGstBill: false,
+        subtotal: args.advance,
+        cgst: 0,
+        sgst: 0,
+        totalAmount: args.advance,
+        advancePaid: args.advance,
+        status: "paid",
+        createdAt: new Date().toISOString().split("T")[0],
+      });
+    }
+
+    return bookingId;
   },
 });
 

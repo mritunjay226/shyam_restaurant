@@ -41,6 +41,7 @@ export const generateRoomBill = mutation({
     serviceCharge: v.optional(v.number()),
     housekeepingCharge: v.optional(v.number()),
     extraCharge: v.optional(v.number()),
+    advancePaid: v.optional(v.number()),
     splitPayments: v.optional(v.array(v.object({
       method: v.string(),
       amount: v.number()
@@ -89,6 +90,10 @@ export const generateRoomBill = mutation({
 
     const totalAmount = subtotal + cgst + sgst;
 
+    // Deduct advance already paid — only store the balance due
+    const advancePaid = args.advancePaid ?? 0;
+    const netPayable = Math.max(0, Math.round((totalAmount - advancePaid) * 100) / 100);
+
     // create bill
     const billId = await ctx.db.insert("bills", {
       billType: "room",
@@ -103,7 +108,8 @@ export const generateRoomBill = mutation({
       extraCharge: ec,
       cgst: Math.round(cgst * 100) / 100,
       sgst: Math.round(sgst * 100) / 100,
-      totalAmount: Math.round(totalAmount * 100) / 100,
+      totalAmount: netPayable,
+      advancePaid: advancePaid > 0 ? advancePaid : undefined,
       paymentMethod: args.paymentMethod,
       splitPayments: args.splitPayments,
       status: "generated",

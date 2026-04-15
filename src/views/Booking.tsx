@@ -256,7 +256,7 @@ export function Booking() {
                 <div className="pt-6 border-t border-brand-cream/10">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-brand-cream/60">{room.price} x {nights} nights</span>
-                    <span>${total}</span>
+                    <span>₹{total}</span>
                   </div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-brand-cream/60">Taxes & Fees</span>
@@ -264,7 +264,7 @@ export function Booking() {
                   </div>
                   <div className="flex justify-between font-serif text-2xl text-brand-cream mt-4 pt-4 border-t border-brand-cream/10">
                     <span>Total</span>
-                    <span>${total}</span>
+                    <span>₹{total}</span>
                   </div>
                 </div>
               </div>
@@ -425,16 +425,16 @@ export function Booking() {
                     <h4 className="font-semibold text-brand-brown mb-4">Payment Breakdown</h4>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-brand-brown/70">Total Amount</span>
-                        <span className="font-medium">${total}</span>
+                        <span className="text-brand-brown/70">Room ({nights} night{nights !== 1 ? 's' : ''})</span>
+                        <span className="font-medium">₹{total.toLocaleString('en-IN')}</span>
                       </div>
-                      <div className="flex justify-between text-brand-red font-medium">
+                      <div className="flex justify-between border-t border-brand-brown/10 pt-3 text-brand-red font-semibold">
                         <span>Advance to Pay Now (20%)</span>
-                        <span>${advance}</span>
+                        <span>₹{advance.toLocaleString('en-IN')}</span>
                       </div>
-                      <div className="flex justify-between border-t border-brand-brown/10 pt-3 mt-3">
+                      <div className="flex justify-between text-sm">
                         <span className="text-brand-brown/70">Balance at Hotel</span>
-                        <span className="font-medium">${balance}</span>
+                        <span className="font-medium">₹{balance.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>
@@ -446,10 +446,10 @@ export function Booking() {
                       className="w-full py-6 text-sm uppercase tracking-widest"
                       disabled={isProcessing}
                     >
-                      {isProcessing ? 'Processing...' : `Pay $${advance} with Razorpay`}
+                      {isProcessing ? 'Processing...' : `Confirm Booking & Pay ₹${advance.toLocaleString('en-IN')} Advance`}
                     </Button>
                     <p className="text-xs text-center text-brand-brown/60 mt-4">
-                      This is a secure, encrypted payment gateway.
+                      20% advance required to confirm your reservation. Remaining balance is due at check-in.
                     </p>
                     <Button type="button" variant="ghost" className="w-full mt-2" onClick={() => setStep(2)} disabled={isProcessing}>
                       Back to Details

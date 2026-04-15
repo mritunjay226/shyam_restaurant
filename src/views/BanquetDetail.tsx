@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id, Doc } from '../../convex/_generated/dataModel';
 import { Button } from '../components/ui/button';
@@ -32,6 +32,15 @@ export function BanquetDetail() {
     eventType: 'wedding',
     guestCount: ''
   });
+  const [guestName, setGuestName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [selectedPackage, setSelectedPackage] = useState<'standard' | 'premium' | 'royal' | 'none'>('none');
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingRef, setBookingRef] = useState('');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createBanquetBooking = useMutation(api.banquet.createBanquetBooking);
 
   const [dietaryFilter, setDietaryFilter] = useState<'all' | 'veg' | 'non-veg'>('all');
   const [activeCategory, setActiveCategory] = useState<string>('');
@@ -169,11 +178,56 @@ export function BanquetDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
 
-  const handleBookNow = (e: React.FormEvent) => {
+  const PACKAGES = {
+    none:     { label: 'No Package', plateCost: 0 },
+    standard: { label: 'Standard Buffet', plateCost: 1200 },
+    premium:  { label: 'Premium Gala', plateCost: 1600 },
+    royal:    { label: 'Royal Feast', plateCost: 2200 },
+  };
+
+  const guests = parseInt(formState.guestCount || '0');
+  const pkg = PACKAGES[selectedPackage];
+  const hallBase = hall?.price ?? 0;
+  const foodTotal = pkg.plateCost * guests;
+  const bookingTotal = hallBase + foodTotal;
+  const bookingAdvance = Math.round(bookingTotal * 0.25);
+  const bookingBalance = bookingTotal - bookingAdvance;
+
+  const handleBookNow = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formState.eventDate) return;
-    const query = new URLSearchParams({ hallId: id, ...formState }).toString();
-    router.push(`/booking?${query}`);
+    const errs: Record<string, string> = {};
+    if (!formState.eventDate) errs.eventDate = 'Event date is required';
+    if (!guestName.trim()) errs.guestName = 'Full name is required';
+    if (!phone.trim()) errs.phone = 'Phone number is required';
+    if (!formState.guestCount || guests < 1) errs.guestCount = 'Guest count is required';
+    if (!isSlotAvailable) errs.slot = 'This slot is unavailable';
+    setFormErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    setIsSubmitting(true);
+    try {
+      const bookingId = await createBanquetBooking({
+        hallId: id,
+        eventName: `${formState.eventType.charAt(0).toUpperCase() + formState.eventType.slice(1)} — ${guestName.trim()}`,
+        eventType: formState.eventType,
+        eventDate: formState.eventDate,
+        timeSlot: formState.timeSlot,
+        guestName: guestName.trim(),
+        guestPhone: `${countryCode}${phone.trim()}`,
+        guestCount: guests,
+        plateCost: pkg.plateCost > 0 ? pkg.plateCost : undefined,
+        menuPackage: pkg.label !== 'No Package' ? pkg.label : undefined,
+        totalAmount: bookingTotal,
+        advance: bookingAdvance,
+        notes: `Package: ${pkg.label}`,
+      });
+      setBookingRef(String(bookingId).slice(-6).toUpperCase());
+      setBookingSuccess(true);
+    } catch (err: any) {
+      setFormErrors({ submit: err.message });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (sysHall === undefined) {
@@ -470,92 +524,200 @@ export function BanquetDetail() {
 
           {/* Right Column: Sticky Booking Form */}
           <div className="lg:col-span-4 mt-8 lg:mt-0">
-            <div className="sticky top-24 lg:top-32">
+            <div className=" top-24 lg:top-12">
               <Card className="border border-brand-brown/10 shadow-2xl shadow-brand-brown/5 bg-white/60 backdrop-blur-xl rounded-[32px] overflow-hidden">
                 <CardContent className="p-6 md:p-8">
-                  <div className="mb-6 pb-6 border-b border-brand-brown/10">
-                    <h3 className="text-xl font-serif text-brand-brown mb-2">Request a Quote</h3>
-                    <p className="text-xs text-brand-brown/60">Fill in your event details to check availability and get accurate pricing.</p>
-                  </div>
 
-                  <form className="space-y-5" onSubmit={handleBookNow}>
-                    
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Sparkles size={12}/> Event Type</Label>
-                      <select 
-                        className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown transition-all"
-                        value={formState.eventType}
-                        onChange={(e) => setFormState({ ...formState, eventType: e.target.value })}
-                      >
-                        <option value="wedding">Wedding / Reception</option>
-                        <option value="corporate">Corporate Event / Meeting</option>
-                        <option value="birthday">Birthday / Anniversary</option>
-                        <option value="other">Other Gathering</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><CalendarDays size={12} /> Date</Label>
-                      <DatePicker 
-                        date={formState.eventDate ? new Date(formState.eventDate) : undefined} 
-                        setDate={(d) => setFormState({ ...formState, eventDate: d ? d.toISOString().split('T')[0] : '' })}
-                        label="Select Event Date"
-                        min={new Date()}
-                        disabled={disabledDates}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Clock size={12} /> Slot</Label>
-                        <select 
-                          className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown transition-all"
-                          value={formState.timeSlot}
-                          onChange={(e) => setFormState({ ...formState, timeSlot: e.target.value })}
-                        >
-                          <option value="morning">Morning</option>
-                          <option value="evening">Evening</option>
-                          <option value="full_day">Full Day</option>
-                        </select>
+                  {bookingSuccess ? (
+                    <div className="text-center py-6">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Check size={28} className="text-green-600" />
                       </div>
-
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Users size={12} /> Guests</Label>
-                        <Input 
-                          type="number" 
-                          placeholder="Count..." 
-                          className="rounded-full border-brand-brown/20 bg-brand-cream h-12 px-4"
-                          value={formState.guestCount}
-                          onChange={(e) => setFormState({ ...formState, guestCount: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="pt-4">
-                       {!isSlotAvailable && formState.eventDate && (
-                         <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-medium text-center">
-                            This slot is currently unavailable.
-                         </div>
-                       )}
-                       
-                       <Button 
-                        type="submit" 
-                        variant="gold" 
-                        disabled={!isSlotAvailable || !formState.eventDate}
-                        className="w-full py-6 text-sm uppercase tracking-widest font-bold shadow-lg transition-all active:scale-95 disabled:opacity-50 rounded-full"
-                       >
-                         {isSlotAvailable ? 'Inquire Now' : 'Unavailable'}
-                       </Button>
-                    </div>
-
-                    <div className="flex items-start gap-2 pt-2 text-brand-brown/40">
-                      <ReceiptText size={14} className="shrink-0 mt-0.5" />
-                      <p className="text-[10px] leading-relaxed">
-                        Submitting this form does not confirm your booking. A manager will contact you with a customized quote. Venue base rental is ₹{hall.price}.
+                      <h3 className="text-2xl font-serif text-brand-brown mb-2">Booking Confirmed!</h3>
+                      <p className="text-brand-brown/60 text-sm mb-4">
+                        Your banquet booking has been registered. Our events team will contact you within 24 hours.
                       </p>
+                      <div className="bg-brand-cream rounded-2xl p-4 text-left space-y-2 text-sm mb-6">
+                        <div className="flex justify-between">
+                          <span className="text-brand-brown/60">Reference</span>
+                          <span className="font-bold text-brand-brown">#{bookingRef}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-brand-brown/60">Date</span>
+                          <span className="font-medium text-brand-brown">{formState.eventDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-brand-brown/60">Advance Due</span>
+                          <span className="font-bold text-brand-red">₹{bookingAdvance.toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => { setBookingSuccess(false); setGuestName(''); setPhone(''); setFormState({ eventDate: '', timeSlot: 'full_day', eventType: 'wedding', guestCount: '' }); }}
+                        className="text-xs text-brand-brown/50 hover:text-brand-brown transition-colors underline"
+                      >
+                        Book another event
+                      </button>
                     </div>
-                  </form>
+                  ) : (
+                    <>
+                      <div className="mb-6 pb-6 border-b border-brand-brown/10">
+                        <h3 className="text-xl font-serif text-brand-brown mb-2">Book This Venue</h3>
+                        <p className="text-xs text-brand-brown/60">Fill in your event details to instantly reserve your date.</p>
+                      </div>
+
+                      {formErrors.submit && (
+                        <div className="mb-4 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs">{formErrors.submit}</div>
+                      )}
+
+                      <form className="space-y-4" onSubmit={handleBookNow}>
+                        <div className="space-y-1.5">
+                          <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Sparkles size={12}/> Event Type</Label>
+                          <select
+                            className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown"
+                            value={formState.eventType}
+                            onChange={(e) => setFormState({ ...formState, eventType: e.target.value })}
+                          >
+                            <option value="wedding">Wedding / Reception</option>
+                            <option value="corporate">Corporate Event</option>
+                            <option value="birthday">Birthday / Anniversary</option>
+                            <option value="other">Other Gathering</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><CalendarDays size={12} /> Event Date</Label>
+                          <DatePicker
+                            date={formState.eventDate ? new Date(formState.eventDate) : undefined}
+                            setDate={(d) => setFormState({ ...formState, eventDate: d ? d.toISOString().split('T')[0] : '' })}
+                            label="Select Event Date"
+                            min={new Date()}
+                            disabled={disabledDates}
+                          />
+                          {formErrors.eventDate && <p className="text-xs text-rose-500">{formErrors.eventDate}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Clock size={12} /> Slot</Label>
+                            <select
+                              className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown"
+                              value={formState.timeSlot}
+                              onChange={(e) => setFormState({ ...formState, timeSlot: e.target.value })}
+                            >
+                              <option value="morning">Morning</option>
+                              <option value="evening">Evening</option>
+                              <option value="full_day">Full Day</option>
+                            </select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Users size={12} /> Guests</Label>
+                            <Input
+                              type="number"
+                              placeholder="Count..."
+                              className="rounded-full border-brand-brown/20 bg-brand-cream h-12 px-4"
+                              value={formState.guestCount}
+                              onChange={(e) => setFormState({ ...formState, guestCount: e.target.value })}
+                            />
+                            {formErrors.guestCount && <p className="text-xs text-rose-500">{formErrors.guestCount}</p>}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-bold uppercase tracking-wider text-brand-brown/80">Full Name</Label>
+                          <Input
+                            type="text"
+                            placeholder="e.g. Rahul Sharma"
+                            className={`rounded-full border-brand-brown/20 bg-brand-cream h-12 px-4 ${formErrors.guestName ? 'border-rose-400' : ''}`}
+                            value={guestName}
+                            onChange={(e) => setGuestName(e.target.value)}
+                          />
+                          {formErrors.guestName && <p className="text-xs text-rose-500">{formErrors.guestName}</p>}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><Phone size={12} /> Phone</Label>
+                          <div className="flex gap-2">
+                            <select
+                              value={countryCode}
+                              onChange={(e) => setCountryCode(e.target.value)}
+                              className="flex h-12 w-20 rounded-full border border-brand-brown/20 bg-brand-cream px-2 text-xs focus:outline-none"
+                            >
+                              <option value="+91">+91</option>
+                              <option value="+1">+1</option>
+                              <option value="+44">+44</option>
+                              <option value="+971">+971</option>
+                            </select>
+                            <Input
+                              type="tel"
+                              placeholder="000-000-0000"
+                              className={`rounded-full border-brand-brown/20 bg-brand-cream h-12 px-4 flex-1 ${formErrors.phone ? 'border-rose-400' : ''}`}
+                              value={phone}
+                              onChange={(e) => setPhone(e.target.value)}
+                            />
+                          </div>
+                          {formErrors.phone && <p className="text-xs text-rose-500">{formErrors.phone}</p>}
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><ReceiptText size={12} /> Menu Package (Optional)</Label>
+                          <select
+                            className="flex h-12 w-full rounded-full border border-brand-brown/20 bg-brand-cream px-4 text-sm focus:outline-none focus:ring-2 focus:ring-brand-brown"
+                            value={selectedPackage}
+                            onChange={(e) => setSelectedPackage(e.target.value as any)}
+                          >
+                            <option value="none">No Package / Custom</option>
+                            <option value="standard">Standard Buffet — ₹1,200/pp</option>
+                            <option value="premium">Premium Gala — ₹1,600/pp</option>
+                            <option value="royal">Royal Feast — ₹2,200/pp</option>
+                          </select>
+                        </div>
+
+                        {/* Price Summary */}
+                        {bookingTotal > 0 && (
+                          <div className="bg-brand-cream rounded-2xl p-4 space-y-2 text-sm border border-brand-brown/10">
+                            <div className="flex justify-between text-brand-brown/70">
+                              <span>Hall Base</span><span>₹{hallBase.toLocaleString('en-IN')}</span>
+                            </div>
+                            {foodTotal > 0 && (
+                              <div className="flex justify-between text-brand-brown/70">
+                                <span>Food ({guests} × ₹{pkg.plateCost.toLocaleString('en-IN')})</span>
+                                <span>₹{foodTotal.toLocaleString('en-IN')}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between font-bold text-brand-brown border-t border-brand-brown/10 pt-2">
+                              <span>Estimated Total</span><span>₹{bookingTotal.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div className="flex justify-between text-brand-red font-semibold">
+                              <span>25% Advance Now</span><span>₹{bookingAdvance.toLocaleString('en-IN')}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="pt-2">
+                          {!isSlotAvailable && formState.eventDate && (
+                            <div className="mb-3 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-medium text-center">
+                              This slot is currently unavailable.
+                            </div>
+                          )}
+                          <Button
+                            type="submit"
+                            variant="gold"
+                            disabled={!isSlotAvailable || !formState.eventDate || isSubmitting}
+                            className="w-full py-6 text-sm uppercase tracking-widest font-bold shadow-lg rounded-full disabled:opacity-50"
+                          >
+                            {isSubmitting ? 'Confirming...' : 'Confirm Booking'}
+                          </Button>
+                        </div>
+
+                        <div className="flex items-start gap-2 text-brand-brown/40">
+                          <ReceiptText size={14} className="shrink-0 mt-0.5" />
+                          <p className="text-[10px] leading-relaxed">
+                            A 25% advance is required to confirm the booking. Our team will contact you to finalize the details. Hall base: ₹{hall.price}.
+                          </p>
+                        </div>
+                      </form>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </div>

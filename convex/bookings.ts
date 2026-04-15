@@ -160,7 +160,7 @@ export const createBooking = mutation({
     await ctx.db.patch(args.roomId, { status: "occupied" });
 
     // ── 5. CREATE BOOKING ─────────────────────────────────────────
-    return ctx.db.insert("bookings", {
+    const bookingId = await ctx.db.insert("bookings", {
       roomId: args.roomId,
       guestId,
       folioNumber,
@@ -179,6 +179,26 @@ export const createBooking = mutation({
       notes: args.notes,
       source: args.source ?? "walk_in",
     });
+
+    // ── 6. RECORD ADVANCE PAYMENT IN BILLS (shows in revenue) ─────
+    if (args.advance > 0) {
+      await ctx.db.insert("bills", {
+        billType: "room",
+        referenceId: bookingId as string,
+        guestName: args.guestName,
+        isGstBill: false,
+        subtotal: args.advance,
+        cgst: 0,
+        sgst: 0,
+        totalAmount: args.advance,
+        advancePaid: args.advance,
+        paymentMethod: args.source === "website" ? "online" : "cash",
+        status: "paid",
+        createdAt: new Date().toISOString().split("T")[0],
+      });
+    }
+
+    return bookingId;
   },
 });
 
