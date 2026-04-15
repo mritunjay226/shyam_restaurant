@@ -31,41 +31,40 @@ export function Home() {
   };
 
   const amenities = [
-    { title: "Infinity Pool", desc: "Temperature-controlled with panoramic city views.", img: "https://images.unsplash.com/photo-1582610116397-edb318620f90?q=80&w=1200&auto=format&fit=crop" },
-    { title: "Wellness Spa", desc: "Holistic treatments and massage therapies.", img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=800&auto=format&fit=crop" },
-    { title: "Fitness Center", desc: "State-of-the-art equipment available 24/7.", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop" },
-    { title: "Executive Lounge", desc: "Exclusive access for suite guests.", img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=1000&auto=format&fit=crop" },
-    { title: "Private Cabanas", desc: "Relax in your own secluded poolside sanctuary.", img: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?q=80&w=800&auto=format&fit=crop" }
+    { title: "Executive Lounge", desc: "_", img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?q=80&w=1000&auto=format&fit=crop" },
+    { title: "Best Cafeteria", desc: "_", img: "https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156180/WhatsApp_Image_2026-04-13_at_5.35.14_PM_h79mok.jpg" },
+    { title: "Luxury Stay", desc: "_", img: "https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156181/838cc4f1-18e1-464d-9a43-3e5305488303_n08fcz.jpg" },
+    { title: "Comfortable waiting rooms", desc: "_", img: "https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156181/WhatsApp_Image_2026-04-13_at_5.35.02_PM_ckocdl.jpg" },
   ];
 
   const glimpses = [
     {
       name: 'Luxury Stay',
-      img: dbRooms?.[0]?.images?.[0] || dbRooms?.[0]?.image || 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=600&auto=format&fit=crop'
+      img: dbRooms?.[0]?.images?.[0] || dbRooms?.[0]?.image || 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776141684/shyam-hotel/gmhjckccltcybf3tadfg.jpg'
     },
     {
       name: 'Fine Dining',
-      img: dbRestaurantItems?.[0]?.image || 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=600&auto=format&fit=crop'
+      img: dbRestaurantItems?.[0]?.image || 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156180/WhatsApp_Image_2026-04-13_at_5.35.07_PM_avjor3.jpg'
     },
     {
       name: 'Artisan Coffee',
-      img: dbCafeItems?.[0]?.image || 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=600&auto=format&fit=crop'
+      img: dbCafeItems?.[0]?.image || 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776096509/reataurant_ouzt5y.jpg'
     },
     {
       name: 'Elegant Events',
-      img: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=600&auto=format&fit=crop'
+      img: 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776090962/banquet-maybe_wrswgw.jpg'
     },
     {
       name: 'Cozy Corners',
-      img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=600&auto=format&fit=crop'
+      img: 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156181/WhatsApp_Image_2026-04-13_at_5.35.02_PM_ckocdl.jpg'
     },
     {
-      name: 'Culinary Art',
-      img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop'
+      name: ' ',
+      img: dbRestaurantItems?.[1]?.image || 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156181/WhatsApp_Image_2026-04-13_at_5.35.01_PM_fe8d7k.jpg'
     },
     {
-      name: 'Culinary Art',
-      img: dbRestaurantItems?.[1]?.image || 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?q=80&w=600&auto=format&fit=crop'
+      name: ' ',
+      img: dbRestaurantItems?.[1]?.image || 'https://res.cloudinary.com/diah8zonu/image/upload/q_auto/f_auto/v1776156180/034406b1-465d-485e-a97a-bff8678e5c4c_fvilsw.jpg'
     },
   ];
 
@@ -138,7 +137,7 @@ export function Home() {
               Blending tradition & innovation to create unforgettable stays and dining experiences.
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-8">
-              <Button className="w-full sm:w-auto px-8 py-6 text-xs tracking-widest uppercase">Discover Our Story</Button>
+              <Link href={"/about"} className="w-full sm:w-auto px-8 py-6 text-xs tracking-widest uppercase bg-brand-red text-white rounded-full hover:bg-brand-brown transition-colors">Discover Our Story</Link>
               <div className="flex items-center gap-4">
                 {/* <div className="flex -space-x-4">
                   <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop" className="w-12 h-12 rounded-full border-2 border-brand-cream object-cover" alt="Customer" />
