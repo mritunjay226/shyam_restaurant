@@ -71,24 +71,22 @@ export function Booking() {
   const disabledDates = React.useMemo(() => {
     const dates: any[] = [{ before: startOfDay(new Date()) }]; // Always disable past
     
+    const now = Date.now();
+    const thirtyMinsAgo = now - (30 * 60 * 1000);
+
     roomBookings.forEach(b => {
-      if (b.status !== 'cancelled' && b.status !== 'checked_out') {
+      const isPending = b.status === 'pending';
+      const isStale = isPending && b._creationTime < thirtyMinsAgo;
+
+      if (b.status !== 'cancelled' && b.status !== 'checked_out' && !isStale) {
         const start = parseISO(b.checkIn);
         const end = parseISO(b.checkOut);
         
-        // Add all days in the range to the disabled list
-        // Note: For hotel bookings, the 'checkOut' day is usually the day to check-in
-        // for the next guest. So we only disable UP TO checkOut - 1 day for arrivals.
-        // However, react-day-picker disabled dates are day-based. 
-        // We'll disable the whole interval for simplicity first, then refine.
         try {
           const days = eachDayOfInterval({ start, end });
-          // But wait, the day of departure is NOT occupied for the next guest
-          // So we remove the last day from the disabled list
           days.pop(); 
           dates.push(...days);
         } catch (e) {
-          // Fallback to simple range if interval fails
           dates.push({ from: start, to: end });
         }
       }
