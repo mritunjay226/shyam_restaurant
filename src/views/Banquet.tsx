@@ -12,7 +12,7 @@ import { Users, Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export function Banquet() {
-  const dbHalls = useQuery(api.banquet.getAllHalls);
+  const dbHalls = useQuery(api.banquet.getAllHalls, {});
   
   const HALL_FALLBACKS = [
     'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800&auto=format&fit=crop',

@@ -18,7 +18,7 @@ export function Footer() {
             </h2>
             <div className="flex space-x-5">
               <a 
-                href="https://facebook.com" 
+                href="https://www.facebook.com/profile.php?id=61574364137238&rdid=S9G1gw6PNXc6SEzL&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BULCiDVX7%2F#" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
@@ -27,7 +27,7 @@ export function Footer() {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-cream/80 group-hover:text-white transition-colors"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
               </a>
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/sarover_palace_banquet?igsh=MWNnZHZ1ZGh2YTExeg%3D%3D" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="group w-12 h-12 rounded-full border border-brand-cream/20 flex items-center justify-center hover:bg-brand-red hover:border-brand-red transition-all duration-300 hover:-translate-y-1 shadow-sm"
@@ -35,7 +35,7 @@ export function Footer() {
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-cream/80 group-hover:text-white transition-colors"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
               </a>
-              <a 
+              {/* <a 
                 href="https://twitter.com" 
                 target="_blank" 
                 rel="noopener noreferrer" 
@@ -52,7 +52,7 @@ export function Footer() {
                 aria-label="Youtube"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-cream/80 group-hover:text-white transition-colors"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-              </a>
+              </a> */}
             </div>
           </motion.div>
           <motion.div 

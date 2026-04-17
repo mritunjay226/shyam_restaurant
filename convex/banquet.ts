@@ -24,7 +24,12 @@ function slotsConflict(a: string | undefined, b: string | undefined): boolean {
 // ─────────────────────────────────────────────────────────────────
 
 export const getAllHalls = query({
-  handler: async (ctx) => ctx.db.query("banquetHalls").collect(),
+  args: { includeInactive: v.optional(v.boolean()) },
+  handler: async (ctx, args) => {
+    const halls = await ctx.db.query("banquetHalls").collect();
+    if (args.includeInactive) return halls;
+    return halls.filter(h => h.isActive !== false);
+  },
 });
 
 export const getHallById = query({
@@ -145,7 +150,27 @@ export const createBanquetBooking = mutation({
       }
     }
 
-    // ── 5. CREATE BOOKING ─────────────────────────────────────────
+    // ── GUEST PROFILE (upsert) ──────────────────────────────────
+    const existingGuest = await ctx.db
+      .query("guests")
+      .withIndex("by_phone", (q) => q.eq("phone", args.guestPhone))
+      .first();
+
+    if (existingGuest) {
+      await ctx.db.patch(existingGuest._id, {
+        totalVisits: existingGuest.totalVisits + 1,
+        totalSpend: existingGuest.totalSpend + args.totalAmount,
+      });
+    } else {
+      await ctx.db.insert("guests", {
+        name: args.guestName,
+        phone: args.guestPhone,
+        totalVisits: 1,
+        totalSpend: args.totalAmount,
+      });
+    }
+
+    // ── CREATE BOOKING ─────────────────────────────────────────
     const bookingId = await ctx.db.insert("banquetBookings", {
       hallId: args.hallId,
       eventName: args.eventName,
@@ -164,7 +189,7 @@ export const createBanquetBooking = mutation({
       notes: args.notes,
     });
 
-    // ── 6. RECORD ADVANCE PAYMENT IN BILLS (shows in revenue) ─────
+    // ── RECORD ADVANCE PAYMENT IN BILLS (shows in revenue) ─────
     if (args.advance > 0) {
       await ctx.db.insert("bills", {
         billType: "banquet",

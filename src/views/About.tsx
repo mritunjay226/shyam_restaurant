@@ -212,7 +212,7 @@ export function About() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div className="max-w-2xl">
-              <Badge variant="outline" className="mb-4 text-brand-red border-brand-red/20">The Shyam Ecosystem</Badge>
+              <Badge variant="outline" className="mb-4 text-brand-red border-brand-red/20">The  Ecosystem</Badge>
               <h2 className="text-4xl md:text-6xl font-serif text-brand-brown leading-tight">Everything you need for a <span className="text-brand-red">perfect</span> experience.</h2>
             </div>
             <p className="text-brand-brown/60 text-lg md:text-right">

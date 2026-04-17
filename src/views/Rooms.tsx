@@ -24,7 +24,7 @@ export function Rooms() {
 
 
   const [filter, setFilter] = useState<RoomCategory | 'All'>('All');
-  const dbRooms = useQuery(api.rooms.getAllRooms);
+  const dbRooms = useQuery(api.rooms.getAllRooms, {});
 
 
 

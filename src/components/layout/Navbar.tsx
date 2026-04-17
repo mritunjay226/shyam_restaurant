@@ -1,11 +1,11 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -41,8 +41,6 @@ export function Navbar() {
         element.scrollIntoView({ behavior: 'smooth' });
       }
       setIsMobileMenuOpen(false);
-    } else {
-      // It will navigate to /#hash and the useEffect will handle the scroll
     }
   };
 
@@ -55,10 +53,10 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Left Nav */}
-          <nav className="hidden nav:flex items-center h-full flex-1">
+          
+          {/* Left Nav (Desktop) */}
+          <nav className="hidden lg:flex items-center h-full flex-1">
             <Link href="/" className="relative h-full flex items-center px-6 border-r border-brand-brown/10 text-[11px] font-bold text-brand-brown hover:text-brand-red transition-colors uppercase tracking-widest group">
-
               <span>Home</span>
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-brand-red scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </Link>
@@ -76,18 +74,21 @@ export function Navbar() {
             </Link>
           </nav>
 
-          {/* Center Logo */}
-          <Link href="/" className="shrink-0 flex items-center justify-center px-6 h-full border-x border-brand-brown/10 nav:border-x-0 lg:border-x">
-            <span className="font-serif text-4xl font-bold text-brand-brown tracking-tight">
-
-              Shayam<span className="text-brand-red">.</span>
-            </span>
+          {/* Center Logo / Left on Mobile */}
+          <Link href="/" className="shrink-0 flex items-center justify-start lg:justify-center px-0 lg:px-6 h-full border-brand-brown/10 lg:border-x">
+            <Image
+              src="/logo.png"
+              alt='Sarovar Palace'
+              width={200}
+              height={100}
+              className='h-14 w-auto object-contain'
+              priority
+            />
           </Link>
 
-          {/* Right Nav */}
-          <nav className="hidden nav:flex items-center h-full flex-1 justify-end">
+          {/* Right Nav (Desktop) */}
+          <nav className="hidden lg:flex items-center h-full flex-1 justify-end">
             <Link href="/cafe" className="relative h-full flex items-center px-6 border-l border-brand-brown/10 text-[11px] font-bold text-brand-brown hover:text-brand-red transition-colors uppercase tracking-widest group">
-
               <span>Cafe</span>
               <span className="absolute bottom-0 left-0 w-full h-[2px] bg-brand-red scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-right"></span>
             </Link>
@@ -106,22 +107,22 @@ export function Navbar() {
           </nav>
 
           {/* Mobile Menu Toggle */}
-          <button className="nav:hidden text-brand-brown" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <button className="lg:hidden text-brand-brown" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
 
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav Dropdown */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -20, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="nav:hidden absolute top-full left-0 right-0 bg-brand-cream border-t border-brand-brown/10 shadow-xl overflow-hidden"
+            className="lg:hidden absolute top-full left-0 right-0 bg-brand-cream border-t border-brand-brown/10 shadow-xl overflow-hidden"
           >
             <div className="flex flex-col px-4 py-6 space-y-4">
               <Link href="/" className="text-lg font-medium text-brand-brown uppercase tracking-widest py-2 border-b border-brand-brown/10">Home</Link>
@@ -136,7 +137,6 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-
     </header>
   );
 }

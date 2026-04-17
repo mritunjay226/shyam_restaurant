@@ -11,6 +11,8 @@ import { CheckCircle2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { DatePicker } from '../components/ui/date-picker';
 import { addDays, format, parseISO, startOfDay, eachDayOfInterval } from 'date-fns';
+import Script from 'next/script';
+import { useAction } from "convex/react";
 
 const COUNTRY_CODES = [
   { code: '+91', name: 'India' },
@@ -27,7 +29,10 @@ const COUNTRY_CODES = [
 
 
 export function Booking() {
-  const dbRooms = useQuery(api.rooms.getAllRooms) || [];
+  const dbRooms = useQuery(api.rooms.getAllRooms, {}) || [];
+  const settings = useQuery(api.settings.getHotelSettings);
+  const advanceRate = (settings?.advancePercentage ?? 20) / 100;
+  
   const roomsData = dbRooms.map(r => ({
     id: r._id,
     name: `Room ${r.roomNumber}`,
@@ -36,7 +41,12 @@ export function Booking() {
 
   const [selectedRoom, setSelectedRoom] = useState<string>('');
   const [step, setStep] = useState(1);
-  const createBooking = useMutation(api.bookings.createBooking);
+  
+  const createPendingBooking = useMutation(api.bookings.createPendingBooking);
+  const createOrder = useAction(api.razorpay.createOrder);
+  const verifySignature = useAction(api.razorpay.verifySignature);
+  
+  const [generatedTrackingCode, setGeneratedTrackingCode] = useState('');
 
   // Fetch bookings for the selected room to disable taken dates
   const roomBookings = useQuery(api.bookings.getBookingsByRoom, 
@@ -156,7 +166,7 @@ export function Booking() {
   }
 
   const total = room.price * nights;
-  const advance = total * 0.2; // 20% advance
+  const advance = total * advanceRate;
   const balance = total - advance;
 
   const today = new Date().toISOString().split('T')[0];
@@ -168,12 +178,12 @@ export function Booking() {
     setErrors({});
     
     try {
-      await createBooking({
+      // 1. Create Pending Booking in DB
+      const { bookingId, trackingCode } = await createPendingBooking({
         roomId: selectedRoom as any,
         guestName: `${firstName.trim()} ${lastName.trim()}`,
         guestPhone: `${countryCode}${phone}`,
         checkIn,
-
         checkOut,
         tariff: room.price,
         advance: advance,
@@ -181,12 +191,63 @@ export function Booking() {
         notes: `Email: ${email}, Guests: ${guests}`,
         source: 'website'
       });
-      setIsProcessing(false);
-      setStep(4);
+
+      setGeneratedTrackingCode(trackingCode);
+
+      // 2. Create Razorpay Order on Server
+      const order = await createOrder({
+        bookingId: bookingId,
+        amount: advance,
+      });
+
+      // 3. Open Razorpay Checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Shyam Hotel",
+        description: `Advance for Room ${room.name}`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          try {
+            setIsProcessing(true);
+            // 4. Verify Signature on Server
+            await verifySignature({
+              bookingId,
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+            
+            setIsProcessing(false);
+            setStep(4);
+          } catch (err: any) {
+            setIsProcessing(false);
+            setErrors({ submit: "Payment verification failed: " + err.message });
+          }
+        },
+        prefill: {
+          name: `${firstName} ${lastName}`,
+          email: email,
+          contact: `${countryCode}${phone}`,
+        },
+        theme: {
+          color: "#8B4513", // brand-brown
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
     } catch (err: any) {
       setIsProcessing(false);
       setErrors({ submit: err.message });
-      setStep(1); // Return to start to adjust overlapping dates
+      // If it failed before Razorpay, maybe overlap or DB error
     }
   };
 
@@ -198,6 +259,10 @@ export function Booking() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full bg-brand-cream min-h-screen pt-32 pb-24"
     >
+      <Script 
+        id="razorpay-checkout-js"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+      />
       <div className="container mx-auto px-4 max-w-4xl">
         
         {/* Progress Bar */}
@@ -429,7 +494,7 @@ export function Booking() {
                         <span className="font-medium">₹{total.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between border-t border-brand-brown/10 pt-3 text-brand-red font-semibold">
-                        <span>Advance to Pay Now (20%)</span>
+                        <span>Advance to Pay Now ({settings?.advancePercentage ?? 20}%)</span>
                         <span>₹{advance.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -449,7 +514,7 @@ export function Booking() {
                       {isProcessing ? 'Processing...' : `Confirm Booking & Pay ₹${advance.toLocaleString('en-IN')} Advance`}
                     </Button>
                     <p className="text-xs text-center text-brand-brown/60 mt-4">
-                      20% advance required to confirm your reservation. Remaining balance is due at check-in.
+                      {settings?.advancePercentage ?? 20}% advance required to confirm your reservation. Remaining balance is due at check-in.
                     </p>
                     <Button type="button" variant="ghost" className="w-full mt-2" onClick={() => setStep(2)} disabled={isProcessing}>
                       Back to Details
@@ -469,12 +534,24 @@ export function Booking() {
                     <CheckCircle2 className="w-10 h-10 text-green-600" />
                   </div>
                   <h2 className="text-4xl font-serif text-brand-brown mb-4">Booking Confirmed!</h2>
+                  <div className="bg-brand-brown/5 p-6 rounded-2xl mb-8 border border-brand-brown/10">
+                    <p className="text-sm text-brand-brown/60 uppercase tracking-widest mb-2 font-bold">Your Tracking Code</p>
+                    <p className="text-5xl font-mono font-bold text-brand-red tracking-wider">{generatedTrackingCode}</p>
+                    <p className="text-xs text-brand-brown/50 mt-4">
+                      Save this code to track your booking status later.
+                    </p>
+                  </div>
                   <p className="text-brand-brown/70 mb-8">
-                    Thank you for choosing Shayam Hotel. Your booking reference is <strong className="text-brand-brown">#SH-84729</strong>. We've sent a confirmation email with details.
+                    Thank you for choosing Shyam Hotel. We&apos;ve sent a confirmation email to <span className="font-medium">{email}</span>.
                   </p>
-                  <Button onClick={() => window.location.href='/'} variant="outline">
-                    Return to Home
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button onClick={() => window.location.href='/tracking'} variant="gold">
+                      Track My Booking
+                    </Button>
+                    <Button onClick={() => window.location.href='/'} variant="outline">
+                      Return to Home
+                    </Button>
+                  </div>
                 </motion.div>
               )}
 

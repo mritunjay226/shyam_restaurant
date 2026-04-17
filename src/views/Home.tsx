@@ -17,7 +17,7 @@ export function Home() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 1000], ["0%", "25%"]);
 
-  const dbRooms = useQuery(api.rooms.getAllRooms);
+  const dbRooms = useQuery(api.rooms.getAllRooms, {});
   const dbCafeItems = useQuery(api.menuItems.getMenuByOutlet, { outlet: 'cafe' });
   const dbRestaurantItems = useQuery(api.menuItems.getMenuByOutlet, { outlet: 'restaurant' });
 

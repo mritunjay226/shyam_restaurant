@@ -32,11 +32,21 @@ export default defineSchema({
     advance: v.number(),
     balance: v.number(),
     totalAmount: v.number(),
-    status: v.string(),            // "confirmed","checked_in","checked_out","cancelled"
+    status: v.string(),            // "confirmed","checked_in","checked_out","cancelled","pending"
     gstBill: v.optional(v.boolean()),
+    extraBed: v.optional(v.boolean()),
     notes: v.optional(v.string()),
-    source: v.optional(v.string()),              // "walk_in","phone","ota"
-  }).index("by_room", ["roomId"]),
+    source: v.optional(v.string()),              // "walk_in","phone","ota","website"
+    razorpayOrderId: v.optional(v.string()),
+    paymentId: v.optional(v.string()),
+    paymentStatus: v.optional(v.string()),       // "pending", "paid", "failed"
+    trackingCode: v.optional(v.string()),
+  })
+    .index("by_room", ["roomId"])
+    .index("by_checkIn", ["checkIn"])
+    .index("by_checkOut", ["checkOut"])
+    .index("by_trackingCode", ["trackingCode"])
+    .index("by_razorpayOrderId", ["razorpayOrderId"]),
 
   // GUEST PROFILES (repeat guest history)
   guests: defineTable({
@@ -115,7 +125,7 @@ export default defineSchema({
     balance: v.number(),
     status: v.string(),
     notes: v.optional(v.string()),
-  }),
+  }).index("by_eventDate", ["eventDate"]),
 
   // FINAL BILLS
   bills: defineTable({
@@ -132,7 +142,8 @@ export default defineSchema({
     cgst: v.number(),
     sgst: v.number(),
     totalAmount: v.number(),
-    advancePaid: v.optional(v.number()),
+    advancePaid: v.optional(v.number()),   // ← new
+    amountDue: v.optional(v.number()),
     paymentMethod: v.optional(v.string()),
     splitPayments: v.optional(v.array(v.object({
       method: v.string(),
@@ -140,7 +151,9 @@ export default defineSchema({
     }))),
     status: v.string(),
     createdAt: v.string(),
-  }),
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_billType_date", ["billType", "createdAt"]),
 
   // HOTEL SETTINGS
   hotelSettings: defineTable({
@@ -159,9 +172,10 @@ export default defineSchema({
     defaultKitchenTab: v.optional(v.string()), // "restaurant" | "cafe"
     defaultBillingTab: v.optional(v.string()), // "rooms" | "tables"
     staffTypes: v.optional(v.array(v.string())),
+    advancePercentage: v.optional(v.number()),
   }),
 
-  // STAFF (RBAC)
+  // STAFF (RBAC & Payroll)
   staff: defineTable({
     name: v.string(),
     pin: v.string(),               // SHA-256 hashed PIN
@@ -169,7 +183,47 @@ export default defineSchema({
     isActive: v.boolean(),
     failedAttempts: v.optional(v.number()),  // brute-force counter
     lockedUntil: v.optional(v.number()),     // ms timestamp; null = not locked
+
+    // Payroll Info
+    baseSalary: v.optional(v.number()),
+    joiningDate: v.optional(v.string()),
+    bankName: v.optional(v.string()),
+    accountNo: v.optional(v.string()),
+    ifsc: v.optional(v.string()),
+    upiId: v.optional(v.string()),
   }).index("by_pin", ["pin"]),
+
+  attendance: defineTable({
+    staffId: v.id("staff"),
+    date: v.string(),              // "YYYY-MM-DD"
+    status: v.string(),            // "present", "absent", "half_day"
+    notes: v.optional(v.string()),
+  }).index("by_staff_date", ["staffId", "date"])
+    .index("by_date", ["date"]),
+
+  staffAdvances: defineTable({
+    staffId: v.id("staff"),
+    amount: v.number(),
+    date: v.string(),
+    reason: v.optional(v.string()),
+    status: v.string(),            // "pending", "recovered"
+  }).index("by_staff", ["staffId"]),
+
+  salaryPayments: defineTable({
+    staffId: v.id("staff"),
+    month: v.string(),             // "YYYY-MM"
+    baseSalary: v.number(),
+    workedDays: v.number(),
+    earnings: v.number(),
+    deductions: v.number(),
+    advanceRecovered: v.number(),
+    netAmount: v.number(),
+    paymentDate: v.string(),
+    status: v.string(),            // "paid"
+    paymentMethod: v.string(),
+    reference: v.optional(v.string()),
+  }).index("by_staff", ["staffId"])
+    .index("by_staff_month", ["staffId", "month"]),
 
   // AUTH SESSIONS
   authSessions: defineTable({
@@ -203,39 +257,146 @@ export default defineSchema({
     .index("by_staff", ["staffId"]),
 
   categories: defineTable({
-    name: v.string(), 
+    name: v.string(),
     description: v.optional(v.string()),
     sortOrder: v.optional(v.number()), // Useful for maintaining the menu's visual order
   }),
+
+  // ─────────────────────────────────────────────────────────────────
+  // GROCERY STORE
+  // ─────────────────────────────────────────────────────────────────
+
+  groceryProducts: defineTable({
+    name: v.string(),
+    category: v.string(),                    // "Dairy", "Grains", "Beverages", etc.
+    subCategory: v.optional(v.string()),
+    barcode: v.optional(v.string()),
+    unit: v.string(),                        // "kg", "litre", "piece", "packet"
+    sellingPrice: v.number(),
+    costPrice: v.optional(v.number()),
+    gstRate: v.optional(v.number()),         // percentage: 0, 5, 12, 18, 28
+    stockQuantity: v.number(),
+    lowStockThreshold: v.number(),
+    description: v.optional(v.string()),
+    image: v.optional(v.string()),
+    brandName: v.optional(v.string()),
+    manufacturer: v.optional(v.string()),
+    ingredients: v.optional(v.string()),
+    isVegetarian: v.optional(v.boolean()),
+    isVegan: v.optional(v.boolean()),
+    isOrganic: v.optional(v.boolean()),
+    countryOfOrigin: v.optional(v.string()),
+    packagingType: v.optional(v.string()),
+    isActive: v.boolean(),
+  })
+    .index("by_category", ["category"])
+    .index("by_barcode", ["barcode"]),
+
+  grocerySales: defineTable({
+    receiptNumber: v.string(),               // "GRC-2025-00001"
+    customerName: v.optional(v.string()),
+    customerPhone: v.optional(v.string()),
+    items: v.array(
+      v.object({
+        productId: v.id("groceryProducts"),
+        name: v.string(),
+        unit: v.string(),
+        quantity: v.number(),
+        sellingPrice: v.number(),
+        gstRate: v.number(),
+      })
+    ),
+    subtotal: v.number(),
+    gstAmount: v.number(),
+    discountAmount: v.number(),
+    totalAmount: v.number(),
+    paymentMethod: v.string(),               // "cash", "upi", "card", "credit"
+    isGstBill: v.boolean(),
+    gstin: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    status: v.string(),                      // "completed", "voided"
+    createdAt: v.string(),
+  })
+    .index("by_createdAt", ["createdAt"])
+    .index("by_receiptNumber", ["receiptNumber"])
+    .index("by_status", ["status"]),
+
+  groceryStockMovements: defineTable({
+    productId: v.id("groceryProducts"),
+    quantityChange: v.number(),              // positive = in, negative = out
+    reason: v.string(),                      // "sale:GRC-…", "purchase:INV-…", "manual_adjustment"
+    stockAfter: v.number(),
+    createdAt: v.string(),
+  }).index("by_product", ["productId"]),
+
+  groceryPurchases: defineTable({
+    supplierName: v.optional(v.string()),
+    invoiceNumber: v.optional(v.string()),
+    items: v.array(
+      v.object({
+        productId: v.id("groceryProducts"),
+        quantity: v.number(),
+        costPrice: v.number(),
+      })
+    ),
+    totalCost: v.number(),
+    paymentMethod: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    purchaseDate: v.string(),
+    status: v.string(),                      // "received", "partial", "pending"
+    createdAt: v.string(),
+  }),
+
+  // BARCODE PRODUCT CACHE (External lookups)
+  barcodeCache: defineTable({
+    barcode: v.string(),
+    source: v.string(),
+    name: v.string(),
+    brandName: v.optional(v.string()),
+    manufacturer: v.optional(v.string()),
+    ingredients: v.optional(v.string()),
+    countryOfOrigin: v.optional(v.string()),
+    packagingType: v.optional(v.string()),
+    image: v.optional(v.string()),
+    unit: v.string(),
+    description: v.optional(v.string()),
+    isVegetarian: v.optional(v.boolean()),
+    isVegan: v.optional(v.boolean()),
+    isOrganic: v.optional(v.boolean()),
+    productType: v.string(),
+    cachedAt: v.number(),
+  }).index("by_barcode", ["barcode"]),
+
+  // ─────────────────────────────────────────────────────────────────
 
   // The actual food and beverage items
   banquetMenuItems: defineTable({
     categoryId: v.id("categories"),
     name: v.string(), // e.g., "VIRGIN PINA COLADA", "Classic Margherita" [cite: 29, 48]
-    
+
     // Optional description for ingredients, e.g., "Pineapple Juice, Fresh Coconut Cream" 
-    description: v.optional(v.string()), 
-    
+    description: v.optional(v.string()),
+
     // The base price of the item
-    price: v.number(), 
-    
+    price: v.number(),
+
     // To handle prices attached to quantities, e.g., "scoop" or "2 pcs" [cite: 76, 78]
-    unit: v.optional(v.string()), 
-    
+    unit: v.optional(v.string()),
+
     // Categorizing items to match the menu's Veg/NonVeg/Egg sections 
     dietaryType: v.optional(
       v.union(v.literal("veg"), v.literal("non-veg"), v.literal("egg"))
-    ), 
-    
+    ),
+
     // To handle restricted timing like Breakfast: "7:00 AM - 10:30 AM" 
-    availabilityWindow: v.optional(v.string()), 
-    
+    availabilityWindow: v.optional(v.string()),
+
     isAvailable: v.boolean(), // Quick toggle to mark items out of stock
 
     image: v.optional(v.string()), // For Cafe/Restaurant views
   })
-  // Index to quickly fetch all items under a specific menu category
-  .index("by_category", ["categoryId"])
-  // Index to filter items by dietary preference
-  .index("by_dietary", ["dietaryType"]),
+    // Index to quickly fetch all items under a specific menu category
+    .index("by_category", ["categoryId"])
+    // Index to filter items by dietary preference
+    .index("by_dietary", ["dietaryType"]),
 });
