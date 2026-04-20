@@ -70,6 +70,20 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Shyam Hotel",
+  },
+};
+
+export const viewport: import("next").Viewport = {
+  themeColor: "#3A1C1A",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
