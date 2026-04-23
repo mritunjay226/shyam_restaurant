@@ -13,7 +13,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Check, ArrowLeft, X, ChevronLeft, ChevronRight, Phone, Mail, Users, CalendarDays, Clock, ShieldAlert, Sparkles, ReceiptText } from 'lucide-react';
 import { DatePicker } from '../components/ui/date-picker';
-import { parseISO, startOfDay } from 'date-fns';
+import { parseISO, startOfDay, format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export function BanquetDetail() {
@@ -588,7 +588,7 @@ export function BanquetDetail() {
                           <Label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-brown/80"><CalendarDays size={12} /> Event Date</Label>
                           <DatePicker
                             date={formState.eventDate ? new Date(formState.eventDate) : undefined}
-                            setDate={(d) => setFormState({ ...formState, eventDate: d ? d.toISOString().split('T')[0] : '' })}
+                            setDate={(d) => setFormState({ ...formState, eventDate: d ? format(d, 'yyyy-MM-dd') : '' })}
                             label="Select Event Date"
                             min={new Date()}
                             disabled={disabledDates}

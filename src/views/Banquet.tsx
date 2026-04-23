@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { motion } from 'motion/react';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -172,7 +173,7 @@ export function Banquet() {
                   <Input 
                     id="date" 
                     type="date" 
-                    min={new Date().toISOString().split('T')[0]}
+                    min={format(new Date(), 'yyyy-MM-dd')}
                     className="bg-brand-brown-light border-brand-brown-light text-brand-cream" 
                     required 
                   />

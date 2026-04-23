@@ -167,7 +167,7 @@ export function Booking() {
   const advance = total * advanceRate;
   const balance = total - advance;
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = format(new Date(), 'yyyy-MM-dd');
 
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -360,7 +360,7 @@ export function Booking() {
                         <Label>Check-in Date</Label>
                         <DatePicker 
                           date={checkIn ? new Date(checkIn) : undefined} 
-                          setDate={(d) => setCheckIn(d ? d.toISOString().split('T')[0] : '')}
+                          setDate={(d) => setCheckIn(d ? format(d, 'yyyy-MM-dd') : '')}
                           label="Select Check-in"
                           min={new Date()}
                           disabled={disabledDates}
@@ -372,7 +372,7 @@ export function Booking() {
                         <Label>Check-out Date</Label>
                         <DatePicker 
                           date={checkOut ? new Date(checkOut) : undefined} 
-                          setDate={(d) => setCheckOut(d ? d.toISOString().split('T')[0] : '')}
+                          setDate={(d) => setCheckOut(d ? format(d, 'yyyy-MM-dd') : '')}
                           label="Select Check-out"
                           min={checkIn ? new Date(checkIn) : new Date()}
                           disabled={disabledDates}

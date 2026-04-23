@@ -255,7 +255,7 @@ export function RoomDetail() {
                         <Label htmlFor="checkin">Check-in</Label>
                         <DatePicker 
                           date={formState.checkIn ? new Date(formState.checkIn) : undefined} 
-                          setDate={(d) => setFormState({ ...formState, checkIn: d ? d.toISOString().split('T')[0] : '' })}
+                          setDate={(d) => setFormState({ ...formState, checkIn: d ? format(d, 'yyyy-MM-dd') : '' })}
                           label="Select Check-in"
                           min={new Date()}
                           disabled={disabledDates}
@@ -265,7 +265,7 @@ export function RoomDetail() {
                         <Label htmlFor="checkout">Check-out</Label>
                         <DatePicker 
                           date={formState.checkOut ? new Date(formState.checkOut) : undefined} 
-                          setDate={(d) => setFormState({ ...formState, checkOut: d ? d.toISOString().split('T')[0] : '' })}
+                          setDate={(d) => setFormState({ ...formState, checkOut: d ? format(d, 'yyyy-MM-dd') : '' })}
                           label="Select Check-out"
                           min={formState.checkIn ? new Date(formState.checkIn) : new Date()}
                           disabled={disabledDates}
