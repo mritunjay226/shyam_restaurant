@@ -452,7 +452,7 @@ export function Home() {
                 <MapPin size={28} />
               </div>
               <h4 className="font-serif text-2xl text-brand-brown mb-3">Visit Us</h4>
-              <p className="text-brand-brown/70 text-lg text-center">1, MG Marg, Opp. Gate No. 4<br />High Court, Civil Lines, Prayagraj</p>
+              <p className="text-brand-brown/70 text-lg text-center">1, MG Marg, Opp. Gate No. 4<br />High Court, Lukerganj, Prayagraj</p>
             </div>
           </div>
 

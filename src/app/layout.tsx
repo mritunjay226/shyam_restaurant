@@ -76,6 +76,7 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Shyam Hotel",
   },
+  
 };
 
 export const viewport: import("next").Viewport = {

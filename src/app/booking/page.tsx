@@ -4,7 +4,7 @@ import { Booking } from '@/views/Booking';
 
 export const metadata: Metadata = {
   title: "Book Your Stay | Shyam Hotel & Restaurant Prayagraj",
-  description: "Fast and easy room booking at Shyam Hotel & Restaurant. Plan your stay in the heart of Civil Lines, Prayagraj today.",
+  description: "Fast and easy room booking at Shyam Hotel & Restaurant. Plan your stay in the heart of Lukerganj, Prayagraj today.",
 };
 
 export default function BookingPage() {
